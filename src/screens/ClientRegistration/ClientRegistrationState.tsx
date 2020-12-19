@@ -1,0 +1,60 @@
+import { createContext, ReactNode, useContext } from "react";
+import { Client } from "../../models/client.schema";
+import {
+  ImmutableStateSetter,
+  useImmutableState,
+} from "../../utils/useImmutableState";
+
+export const ClientRegistrationContext = createContext<
+  | [
+      Omit<Client, "clientId" | "registrationDate">,
+      ImmutableStateSetter<Omit<Client, "clientId" | "registrationDate">>
+    ]
+  | null
+>(null);
+
+export function useClientRegistrationContext() {
+  const val = useContext(ClientRegistrationContext);
+
+  if (!val) {
+    throw new Error("Must supply provider!");
+  }
+
+  return val;
+}
+
+export function ClientRegistrationProvider(p: { children?: ReactNode }) {
+  const [
+    clientRegistrationState,
+    setClientRegistrationState,
+  ] = useImmutableState<Omit<Client, "clientId" | "registrationDate">>({
+    address1: "",
+    address2: "",
+    city: "",
+    country: "",
+    firstName: "",
+    lastName: "",
+    state: "",
+    zip: "",
+    householdInfo: {
+      numAdults: 0,
+      numkids: 0,
+      numSeniors: 0,
+      numMales: 0,
+      numFemales: 0,
+      numWhites: 0,
+      numBlack: 0,
+      numHispanic: 0,
+      numAsian: 0,
+      numOther: 0,
+    },
+  });
+
+  return (
+    <ClientRegistrationContext.Provider
+      value={[clientRegistrationState, setClientRegistrationState]}
+    >
+      {p.children}
+    </ClientRegistrationContext.Provider>
+  );
+}
