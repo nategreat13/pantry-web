@@ -11,4 +11,6 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
-export { db };
+const clientRef = db.collection("client");
+
+export { db, clientRef };

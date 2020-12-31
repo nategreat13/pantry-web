@@ -11,7 +11,7 @@ import Container from "@material-ui/core/Container";
 import { Formik } from "formik";
 import { useHistory } from "react-router-dom";
 import * as Yup from "yup";
-import { useClientRegistrationContext } from "./ClientRegistrationState";
+import { registerPantry } from "../../api/pantry/registerPantry";
 import { COLORS } from "../../constants/COLORS";
 
 const useStyles = makeStyles((theme) => ({
@@ -34,14 +34,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function ClientRegistration() {
+export function PantryRegistration() {
   const classes = useStyles();
   const history = useHistory();
-
-  const [
-    clientRegistrationState,
-    setClientRegistrationState,
-  ] = useClientRegistrationContext();
 
   return (
     <Container component="main" maxWidth="sm">
@@ -50,38 +45,40 @@ export function ClientRegistration() {
         <Avatar className={classes.avatar}>
           <RegistrationIcon />
         </Avatar>
-        <Typography variant="h5">Client Registration</Typography>
+        <Typography variant="h5">Pantry Registration</Typography>
         <Formik
           initialValues={{
-            firstName: clientRegistrationState.firstName,
-            lastName: clientRegistrationState.lastName,
-            address1: clientRegistrationState.address1,
-            address2: clientRegistrationState.address2,
-            city: clientRegistrationState.city,
-            state: clientRegistrationState.state,
-            zip: clientRegistrationState.zip,
-            phoneNumber: clientRegistrationState.phoneNumber,
+            name: "",
+            address1: "",
+            address2: "",
+            city: "",
+            state: "",
+            zip: "",
+            phoneNumber: "",
+            adminPassword: "",
           }}
           onSubmit={async (values) => {
-            setClientRegistrationState({
-              firstName: values.firstName,
-              lastName: values.lastName,
-              address1: values.address1,
-              address2: values.address2,
-              city: values.city,
-              state: values.state,
-              zip: values.zip,
-              phoneNumber: values.phoneNumber,
+            const pantryId = await registerPantry({
+              pantry: {
+                name: values.name,
+                address1: values.address1,
+                address2: values.address2,
+                city: values.city,
+                state: values.state,
+                zip: values.zip,
+                phoneNumber: values.phoneNumber,
+                adminPassword: values.adminPassword,
+              },
             });
-            history.push("/client/register/householdInfo");
+            history.replace(`/pantry/register/success/${pantryId}`);
           }}
           validationSchema={Yup.object().shape({
-            firstName: Yup.string().required(),
-            lastName: Yup.string().required(),
+            name: Yup.string().required(),
             address1: Yup.string().required(),
             city: Yup.string().required(),
             state: Yup.string().required(),
             zip: Yup.number().required(),
+            adminPassword: Yup.string().required(),
           })}
         >
           {({
@@ -95,36 +92,19 @@ export function ClientRegistration() {
           }) => (
             <form className={classes.form} noValidate onSubmit={handleSubmit}>
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="First Name"
-                    name="firstName"
+                    label="Name"
+                    name="name"
                     required
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
                     }}
                     type="text"
-                    value={values.firstName}
+                    value={values.name}
                     variant="outlined"
-                    autoComplete="fname"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    fullWidth
-                    label="Last Name"
-                    name="lastName"
-                    required
-                    onBlur={handleBlur}
-                    onChange={(e) => {
-                      handleChange(e);
-                    }}
-                    type="text"
-                    value={values.lastName}
-                    variant="outlined"
-                    autoComplete="lname"
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -221,20 +201,36 @@ export function ClientRegistration() {
                     }}
                   />
                 </Grid>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    id="adminPassword"
+                    name="adminPassword"
+                    label="Admin Password"
+                    fullWidth
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    value={values.adminPassword}
+                    type="password"
+                    onChange={(e) => {
+                      console.log(values);
+                      console.log(isValid);
+                      handleChange(e);
+                    }}
+                    required
+                  />
+                </Grid>
               </Grid>
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                className={classes.submit}
-                disabled={!isValid || !values.firstName}
                 style={{
                   backgroundColor:
-                    !isValid || !values.firstName
-                      ? COLORS.surface
-                      : COLORS.primary,
+                    !isValid || !values.name ? COLORS.surface : COLORS.primary,
                   color: COLORS.buttonTextColor,
                 }}
+                className={classes.submit}
+                disabled={!isValid || !values.name}
               >
                 Next
               </Button>

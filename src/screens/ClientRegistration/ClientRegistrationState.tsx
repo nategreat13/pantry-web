@@ -6,11 +6,7 @@ import {
 } from "../../utils/useImmutableState";
 
 export const ClientRegistrationContext = createContext<
-  | [
-      Omit<Client, "clientId" | "registrationDate">,
-      ImmutableStateSetter<Omit<Client, "clientId" | "registrationDate">>
-    ]
-  | null
+  [Client, ImmutableStateSetter<Client>] | null
 >(null);
 
 export function useClientRegistrationContext() {
@@ -27,11 +23,12 @@ export function ClientRegistrationProvider(p: { children?: ReactNode }) {
   const [
     clientRegistrationState,
     setClientRegistrationState,
-  ] = useImmutableState<Omit<Client, "clientId" | "registrationDate">>({
+  ] = useImmutableState<Client>({
+    id: "",
+    registrationDate: 0,
     address1: "",
     address2: "",
     city: "",
-    country: "",
     firstName: "",
     lastName: "",
     state: "",

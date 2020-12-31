@@ -1,80 +1,123 @@
 import {
   Button,
+  Container,
+  Grid,
+  makeStyles,
   Theme,
   useMediaQuery,
   useTheme,
 } from "@material-ui/core";
-import React, {  } from "react";
+import React from "react";
 import { View } from "react-native-web";
 import { useHistory } from "react-router-dom";
-import { StyledText } from "../components/StyledText";
 import { COLORS } from "../constants/COLORS";
+import { useGlobalContext } from "../global/globalState";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+}));
 
 export function Home() {
   const theme = useTheme<Theme>();
+  const classes = useStyles();
   const mobileDevice = useMediaQuery(theme.breakpoints.down("sm"));
   let history = useHistory();
-  // const [redirect, setRedirect] = useState("");
-
-  // if (redirect) {
-  //   return <Redirect to={redirect} />;
-  // }
+  const [globalState, setGlobalState] = useGlobalContext();
 
   return (
-    <View
-      style={{
-        alignItems: "center",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <StyledText
-        style={{ fontSize: 48, marginTop: 48, color: COLORS.primary }}
-      >
-        Pantry Manager
-      </StyledText>
-      <View
-        style={{
-          marginTop: 48,
-          flexDirection: mobileDevice ? "column" : "row",
-        }}
-      >
-        <Button
-          style={{
-            backgroundColor: COLORS.primary,
-            color: COLORS.buttonTextColor,
-            marginRight: mobileDevice ? 0 : 16,
-            marginBottom: mobileDevice ? 16 : 0,
-          }}
-          onClick={() => {
-            history.push("/pantryRegistration");
-          }}
-        >
-          Pantry Registration
-        </Button>
-        <Button
-          style={{
-            backgroundColor: COLORS.primary,
-            color: COLORS.buttonTextColor,
-            marginRight: mobileDevice ? 0 : 16,
-            marginBottom: mobileDevice ? 16 : 0,
-          }}
-        >
-          Pantry Worker Registration
-        </Button>
-        <Button
-          style={{
-            backgroundColor: COLORS.primary,
-            color: COLORS.buttonTextColor,
-            marginBottom: mobileDevice ? 16 : 0,
-          }}
-          onClick={() => {
-            history.push("/clientRegistration");
-          }}
-        >
-          Client Registration
-        </Button>
-      </View>
-    </View>
+    <Container component="main" maxWidth="sm">
+      {/* <CssBaseline /> */}
+      <div className={classes.paper}>
+        <Grid container spacing={2} style={{ marginTop: 12 }}>
+          {!globalState.user ? (
+            <Grid item xs={12}>
+              <Button
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.buttonTextColor,
+                  marginRight: mobileDevice ? 0 : 16,
+                  marginBottom: mobileDevice ? 16 : 0,
+                  width: "100%",
+                }}
+                onClick={() => {
+                  history.push("/pantry/register");
+                }}
+              >
+                Pantry Registration
+              </Button>
+            </Grid>
+          ) : null}
+          {!globalState.user ? (
+            <Grid item xs={12}>
+              <Button
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.buttonTextColor,
+                  marginRight: mobileDevice ? 0 : 16,
+                  marginBottom: mobileDevice ? 16 : 0,
+                  width: "100%",
+                }}
+                onClick={() => {
+                  history.push("/pantry/login");
+                }}
+              >
+                Pantry Login
+              </Button>
+            </Grid>
+          ) : null}
+          {!globalState.user ? (
+            <Grid item xs={12}>
+              <Button
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.buttonTextColor,
+                  marginRight: mobileDevice ? 0 : 16,
+                  marginBottom: mobileDevice ? 16 : 0,
+                  width: "100%",
+                }}
+              >
+                Pantry Admin Login
+              </Button>
+            </Grid>
+          ) : null}
+
+          <Grid item xs={12}>
+            <Button
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.buttonTextColor,
+                marginBottom: mobileDevice ? 16 : 0,
+                width: "100%",
+              }}
+              onClick={() => {
+                history.push("/client/register");
+              }}
+            >
+              Client Registration
+            </Button>
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.buttonTextColor,
+                marginBottom: mobileDevice ? 16 : 0,
+                width: "100%",
+              }}
+              onClick={() => {
+                history.push("/client/checkin");
+              }}
+            >
+              Client Check-in
+            </Button>
+          </Grid>
+        </Grid>
+      </div>
+    </Container>
   );
 }

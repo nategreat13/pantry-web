@@ -1,5 +1,3 @@
-export type ClientId = string;
-
 export interface ClientHouseholdInfo {
   numAdults: number;
   numkids: number;
@@ -14,7 +12,7 @@ export interface ClientHouseholdInfo {
 }
 
 export interface Client {
-  clientId: ClientId;
+  id: string;
   registrationDate: number;
   firstName: string;
   lastName: string;
@@ -23,7 +21,6 @@ export interface Client {
   city: string;
   state: string;
   zip: string;
-  country: string;
   phoneNumber?: string;
   householdInfo: ClientHouseholdInfo;
 }

@@ -1,17 +1,17 @@
-import React, { createContext, useContext, useState } from "react";
+import React from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
 import RegistrationIcon from "@material-ui/icons/Assignment";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Formik } from "formik";
-import { Client } from "../../models/client.schema";
 import { useClientRegistrationContext } from "./ClientRegistrationState";
 import { FormControl, InputLabel, Select, MenuItem } from "@material-ui/core";
+import { registerClient } from "../../api/client/registerClient";
+import { useHistory } from "react-router-dom";
+import { COLORS } from "../../constants/COLORS";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
   },
   avatar: {
     margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
+    backgroundColor: COLORS.primary,
   },
   form: {
     width: "100%",
@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 
 export function ClientRegistrationHouseholdInfo() {
   const classes = useStyles();
+  const history = useHistory();
   const [
     clientRegistrationState,
     setClientRegistrationState,
@@ -48,15 +49,13 @@ export function ClientRegistrationHouseholdInfo() {
   const limit = 10;
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="sm">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
           <RegistrationIcon />
         </Avatar>
-        <Typography component="h1" variant="h5">
-          Household Info
-        </Typography>
+        <Typography variant="h5">Household Info</Typography>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h6">Age</Typography>
@@ -79,7 +78,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -103,7 +106,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -127,7 +134,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -153,7 +164,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -177,7 +192,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -203,7 +222,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -227,7 +250,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -250,7 +277,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -273,7 +304,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -296,7 +331,11 @@ export function ClientRegistrationHouseholdInfo() {
                 }}
               >
                 {Array.from(Array(limit).keys()).map((val) => {
-                  return <MenuItem value={val}>{val}</MenuItem>;
+                  return (
+                    <MenuItem key={val} value={val}>
+                      {val}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -306,10 +345,20 @@ export function ClientRegistrationHouseholdInfo() {
           type="submit"
           fullWidth
           variant="contained"
-          color="primary"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+          }}
           className={classes.submit}
+          onClick={async () => {
+            const clientId = await registerClient({
+              client: clientRegistrationState,
+            });
+            setClientRegistrationState({ id: `${clientId}` });
+            history.replace("/client/register/success");
+          }}
         >
-          Next
+          Register
         </Button>
       </div>
     </Container>
