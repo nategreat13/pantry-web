@@ -39,7 +39,7 @@ export function PantryRegistration() {
   const history = useHistory();
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -55,6 +55,7 @@ export function PantryRegistration() {
             state: "",
             zip: "",
             phoneNumber: "",
+            password: "",
             adminPassword: "",
           }}
           onSubmit={async (values) => {
@@ -67,6 +68,7 @@ export function PantryRegistration() {
                 state: values.state,
                 zip: values.zip,
                 phoneNumber: values.phoneNumber,
+                password: values.password,
                 adminPassword: values.adminPassword,
               },
             });
@@ -203,6 +205,22 @@ export function PantryRegistration() {
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <TextField
+                    id="password"
+                    name="password"
+                    label="Password"
+                    fullWidth
+                    variant="outlined"
+                    onBlur={handleBlur}
+                    value={values.password}
+                    type="password"
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <TextField
                     id="adminPassword"
                     name="adminPassword"
                     label="Admin Password"
@@ -212,8 +230,6 @@ export function PantryRegistration() {
                     value={values.adminPassword}
                     type="password"
                     onChange={(e) => {
-                      console.log(values);
-                      console.log(isValid);
                       handleChange(e);
                     }}
                     required

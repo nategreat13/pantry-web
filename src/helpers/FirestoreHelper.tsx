@@ -7,11 +7,13 @@ import {
   MagicServerTimestampString,
 } from "firestore-lift";
 import { Client } from "../models/client.schema";
+import { ClientCheckin } from "../models/clientCheckin.schema";
 import { Pantry } from "../models/pantry.schema";
 
 export interface FirestoreHelper {
   Client: FirestoreLift<Client>;
   Pantry: FirestoreLift<Pantry>;
+  ClientCheckIn: FirestoreLift<ClientCheckin>;
   _BatchRunner: BatchRunner;
   _MagicDeleteValue: any;
   _MagicIncrementValue: any;
@@ -36,10 +38,11 @@ export function generateFirestoreHelper(config: {
     _RawFirebaseApp: config.app,
   };
 
-  const collections: string[] = ["Client", "Pantry"];
+  const collections: string[] = ["Client", "Pantry", "ClientCheckIn"];
   const collectionNames: Record<string, string> = {
     Client: "Clients",
     Pantry: "Pantries",
+    ClientCheckIn: "ClientCheckIns",
   };
 
   collections.forEach((coll) => {

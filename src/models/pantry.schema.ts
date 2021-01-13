@@ -8,5 +8,7 @@ export interface Pantry {
   zip: string;
   phoneNumber?: string;
   registrationDate: number;
+  password: string;
   adminPassword: string;
+  terms: Record<string, true>;
 }

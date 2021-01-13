@@ -8,7 +8,6 @@ import {
   useTheme,
 } from "@material-ui/core";
 import React from "react";
-import { View } from "react-native-web";
 import { useHistory } from "react-router-dom";
 import { COLORS } from "../constants/COLORS";
 import { useGlobalContext } from "../global/globalState";
@@ -33,7 +32,7 @@ export function Home() {
     <Container component="main" maxWidth="sm">
       {/* <CssBaseline /> */}
       <div className={classes.paper}>
-        <Grid container spacing={2} style={{ marginTop: 12 }}>
+        <Grid container spacing={2}>
           {!globalState.user ? (
             <Grid item xs={12}>
               <Button
@@ -41,7 +40,7 @@ export function Home() {
                   backgroundColor: COLORS.primary,
                   color: COLORS.buttonTextColor,
                   marginRight: mobileDevice ? 0 : 16,
-                  marginBottom: mobileDevice ? 16 : 0,
+
                   width: "100%",
                 }}
                 onClick={() => {
@@ -52,6 +51,21 @@ export function Home() {
               </Button>
             </Grid>
           ) : null}
+          <Grid item xs={12}>
+            <Button
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.buttonTextColor,
+
+                width: "100%",
+              }}
+              onClick={() => {
+                history.push("/pantry/lookup");
+              }}
+            >
+              Pantry Lookup
+            </Button>
+          </Grid>
           {!globalState.user ? (
             <Grid item xs={12}>
               <Button
@@ -59,7 +73,7 @@ export function Home() {
                   backgroundColor: COLORS.primary,
                   color: COLORS.buttonTextColor,
                   marginRight: mobileDevice ? 0 : 16,
-                  marginBottom: mobileDevice ? 16 : 0,
+
                   width: "100%",
                 }}
                 onClick={() => {
@@ -70,28 +84,28 @@ export function Home() {
               </Button>
             </Grid>
           ) : null}
-          {!globalState.user ? (
+          {/* {!globalState.user ? (
             <Grid item xs={12}>
               <Button
                 style={{
                   backgroundColor: COLORS.primary,
                   color: COLORS.buttonTextColor,
                   marginRight: mobileDevice ? 0 : 16,
-                  marginBottom: mobileDevice ? 16 : 0,
+
                   width: "100%",
                 }}
               >
                 Pantry Admin Login
               </Button>
             </Grid>
-          ) : null}
+          ) : null} */}
 
           <Grid item xs={12}>
             <Button
               style={{
                 backgroundColor: COLORS.primary,
                 color: COLORS.buttonTextColor,
-                marginBottom: mobileDevice ? 16 : 0,
+
                 width: "100%",
               }}
               onClick={() => {
@@ -101,21 +115,40 @@ export function Home() {
               Client Registration
             </Button>
           </Grid>
-          <Grid item xs={12}>
-            <Button
-              style={{
-                backgroundColor: COLORS.primary,
-                color: COLORS.buttonTextColor,
-                marginBottom: mobileDevice ? 16 : 0,
-                width: "100%",
-              }}
-              onClick={() => {
-                history.push("/client/checkin");
-              }}
-            >
-              Client Check-in
-            </Button>
-          </Grid>
+          {globalState.user ? (
+            <Grid item xs={12}>
+              <Button
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.buttonTextColor,
+
+                  width: "100%",
+                }}
+                onClick={() => {
+                  history.push("/client/checkin");
+                }}
+              >
+                Client Check-in
+              </Button>
+            </Grid>
+          ) : null}
+          {globalState.user ? (
+            <Grid item xs={12}>
+              <Button
+                style={{
+                  backgroundColor: COLORS.primary,
+                  color: COLORS.buttonTextColor,
+
+                  width: "100%",
+                }}
+                onClick={() => {
+                  history.push("/client/lookup");
+                }}
+              >
+                Client Lookup
+              </Button>
+            </Grid>
+          ) : null}
         </Grid>
       </div>
     </Container>

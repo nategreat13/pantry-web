@@ -1,14 +1,15 @@
 export interface ClientHouseholdInfo {
   numAdults: number;
-  numkids: number;
+  numKids: number;
   numSeniors: number;
   numMales: number;
   numFemales: number;
+  numOtherGender: number;
   numWhites: number;
   numBlack: number;
   numHispanic: number;
   numAsian: number;
-  numOther: number;
+  numOtherEthnicity: number;
 }
 
 export interface Client {

@@ -4,15 +4,15 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import Grid from "@material-ui/core/Grid";
-import CheckinIcon from "@material-ui/icons/Room";
+import SearchIcon from "@material-ui/icons/Search";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik } from "formik";
-import { useGlobalContext } from "../../global/globalState";
 import { COLORS } from "../../constants/COLORS";
-import { checkInClient } from "../../api/clientCheckIn/checkInClient";
 import { StyledText } from "../../components/StyledText";
+import { Pantry } from "../../models/pantry.schema";
+import { lookupPantry } from "../../api/pantry/lookupPantry";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,40 +34,38 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export function ClientCheckin() {
+export function PantryLookup() {
   const classes = useStyles();
-  const [globalState] = useGlobalContext();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [possiblePantries, setpossiblePantries] = useState<Pantry[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <CheckinIcon />
+          <SearchIcon />
         </Avatar>
-        <Typography variant="h5">Client Check-in</Typography>
+        <Typography variant="h5">Lookup Pantry</Typography>
         <Formik
           initialValues={{
-            clientId: "",
+            name: "",
+            zip: "",
           }}
           onSubmit={async (values) => {
             setErrorMessage("");
             setSuccessMessage("");
-            if (globalState.user) {
-              const checkin = await checkInClient({
-                clientId: `${values.clientId}`,
-                pantry: globalState.user.pantry,
-              });
 
-              if (checkin === null) {
-                setErrorMessage("Client not found. Please check the Client ID");
-              } else {
-                setSuccessMessage(
-                  `Successful Check-in:\nClient Name: ${checkin.client.firstName} ${checkin.client.lastName}`
-                );
-              }
+            const possiblePantries = await lookupPantry({
+              name: values.name,
+              zip: values.zip,
+            });
+
+            setpossiblePantries(possiblePantries);
+            if (!hasSearched) {
+              setHasSearched(true);
             }
           }}
         >
@@ -77,16 +75,30 @@ export function ClientCheckin() {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    id="clientId"
-                    label="Client ID"
-                    name="clientId"
-                    required
+                    id="name"
+                    label="Pantry Name"
+                    name="name"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    type="string"
+                    value={values.name}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    id="zip"
+                    label="Zip Code"
+                    name="zip"
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
                     }}
                     type="number"
-                    value={values.clientId}
+                    value={values.zip}
                     variant="outlined"
                   />
                 </Grid>
@@ -96,15 +108,15 @@ export function ClientCheckin() {
                 fullWidth
                 variant="contained"
                 style={{
-                  backgroundColor: !values.clientId
+                  backgroundColor: !(values.name || values.zip)
                     ? COLORS.surface
                     : COLORS.primary,
                   color: COLORS.buttonTextColor,
                 }}
                 className={classes.submit}
-                disabled={!values.clientId}
+                disabled={!(values.name || values.zip)}
               >
-                Check In Client
+                Lookup Client
               </Button>
               {errorMessage ? (
                 <StyledText style={{ color: COLORS.buttonNegativeColor }}>
@@ -119,7 +131,51 @@ export function ClientCheckin() {
             </form>
           )}
         </Formik>
+
+        {possiblePantries.length ? (
+          <Grid container spacing={2}>
+            <PossiblePantryRow type={"header"} />
+            {possiblePantries.map((pantry) => {
+              return <PossiblePantryRow type={"pantry"} pantry={pantry} />;
+            })}
+          </Grid>
+        ) : hasSearched ? (
+          <StyledText style={{ color: COLORS.buttonNegativeColor }}>
+            No Pantries Found
+          </StyledText>
+        ) : null}
       </div>
     </Container>
+  );
+}
+
+function PossiblePantryRow(
+  p:
+    | {
+        type: "header";
+      }
+    | {
+        type: "pantry";
+        pantry: Pantry;
+      }
+) {
+  return (
+    <>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Pantry ID" : p.pantry.id}
+        </StyledText>
+      </Grid>
+      <Grid item xs={6}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Pantry Name" : p.pantry.name}
+        </StyledText>
+      </Grid>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Zip Code" : p.pantry.zip}
+        </StyledText>
+      </Grid>
+    </>
   );
 }

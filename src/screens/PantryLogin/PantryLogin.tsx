@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,6 +14,7 @@ import * as Yup from "yup";
 import { getPantry } from "../../api/pantry/getPantry";
 import { useGlobalContext } from "../../global/globalState";
 import { COLORS } from "../../constants/COLORS";
+import { StyledText } from "../../components/StyledText";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -39,9 +40,11 @@ export function PantryLogin() {
   const classes = useStyles();
   const history = useHistory();
   const [globalState, setGlobalState] = useGlobalContext();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
@@ -51,6 +54,7 @@ export function PantryLogin() {
         <Formik
           initialValues={{
             pantryId: "",
+            password: "",
             firstName: "",
             lastName: "",
             email: "",
@@ -58,7 +62,11 @@ export function PantryLogin() {
           onSubmit={async (values) => {
             const pantry = await getPantry({ id: `${values.pantryId}` });
             if (!pantry) {
-              console.log("ERROR!!!!!!");
+              setErrorMessage("Invalid Pantry ID");
+              return;
+            }
+            if (pantry.password !== values.password) {
+              setErrorMessage("Incorrect Password");
               return;
             }
             setGlobalState({
@@ -73,6 +81,7 @@ export function PantryLogin() {
           }}
           validationSchema={Yup.object().shape({
             pantryId: Yup.number().required(),
+            password: Yup.string().required(),
             firstName: Yup.string().required(),
             lastName: Yup.string().required(),
             email: Yup.string().required(),
@@ -102,6 +111,22 @@ export function PantryLogin() {
                     }}
                     type="number"
                     value={values.pantryId}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    required
+                    id="password"
+                    name="password"
+                    label="Password"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    type="password"
+                    value={values.password}
+                    fullWidth
                     variant="outlined"
                   />
                 </Grid>
@@ -168,6 +193,16 @@ export function PantryLogin() {
               >
                 Login
               </Button>
+              {errorMessage ? (
+                <StyledText style={{ color: COLORS.buttonNegativeColor }}>
+                  {errorMessage}
+                </StyledText>
+              ) : null}
+              {successMessage ? (
+                <StyledText style={{ color: COLORS.buttonPositiveColor }}>
+                  {successMessage}
+                </StyledText>
+              ) : null}
             </form>
           )}
         </Formik>

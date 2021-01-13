@@ -3,12 +3,22 @@ import { getFirestoreHelper } from "../../services/firebase.service";
 import { getNewPantryId } from "./getNewPantryId";
 
 export async function registerPantry(p: {
-  pantry: Omit<Pantry, "id" | "registrationDate">;
+  pantry: Omit<Pantry, "id" | "registrationDate" | "terms">;
 }) {
   const id = await getNewPantryId();
   const pantryToAdd: Pantry = {
     ...p.pantry,
-    ...{ registrationDate: Date.now(), id: `${id}` },
+    ...{
+      registrationDate: Date.now(),
+      id: `${id}`,
+      terms: p.pantry.name
+        .split(" ")
+        .filter((t) => t !== " " && t !== "")
+        .reduce((arr, t) => {
+          arr[t.toLowerCase()] = true;
+          return arr;
+        }, {} as Record<string, true>),
+    },
   };
 
   await getFirestoreHelper().Pantry.add({ item: pantryToAdd });

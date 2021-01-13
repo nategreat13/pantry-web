@@ -35,15 +35,16 @@ export function ClientRegistrationProvider(p: { children?: ReactNode }) {
     zip: "",
     householdInfo: {
       numAdults: 0,
-      numkids: 0,
+      numKids: 0,
       numSeniors: 0,
       numMales: 0,
       numFemales: 0,
+      numOtherGender: 0,
       numWhites: 0,
       numBlack: 0,
       numHispanic: 0,
       numAsian: 0,
-      numOther: 0,
+      numOtherEthnicity: 0,
     },
   });
 

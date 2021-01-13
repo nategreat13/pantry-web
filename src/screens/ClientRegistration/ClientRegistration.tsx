@@ -44,7 +44,7 @@ export function ClientRegistration() {
   ] = useClientRegistrationContext();
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>

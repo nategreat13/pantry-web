@@ -8,12 +8,14 @@ import {
 import { Header } from "./components/Header";
 import { GlobalContextProvider } from "./global/globalState";
 import { ClientCheckin } from "./screens/ClientCheckin/ClientCheckin";
+import { ClientLookup } from "./screens/ClientLookup/ClientLookup";
 import { ClientRegistrationHouseholdInfo } from "./screens/ClientRegistration/ClienRegistrationHouseholdInfo";
 import { ClientRegistration } from "./screens/ClientRegistration/ClientRegistration";
 import { ClientRegistrationProvider } from "./screens/ClientRegistration/ClientRegistrationState";
 import { ClientRegistrationSuccess } from "./screens/ClientRegistration/ClientRegistrationSuccess";
 import { Home } from "./screens/Home";
 import { PantryLogin } from "./screens/PantryLogin/PantryLogin";
+import { PantryLookup } from "./screens/PantryLookup/PantryLookup";
 import { PantryRegistration } from "./screens/PantryRegistration/PantryRegistration";
 import { PantryRegistrationSuccess } from "./screens/PantryRegistration/PantryRegistrationSuccess";
 import { initFirebase } from "./services/firebase.service";
@@ -28,6 +30,12 @@ export default function App() {
           <Switch>
             <Route exact path="/client/checkin">
               <ClientCheckin />
+            </Route>
+            <Route exact path="/client/lookup">
+              <ClientLookup />
+            </Route>
+            <Route exact path="/pantry/lookup">
+              <PantryLookup />
             </Route>
             <Route exact path="/">
               <BaseRoute />
