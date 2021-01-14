@@ -70,7 +70,7 @@ export function ClientRegistration() {
               address2: values.address2,
               city: values.city,
               state: values.state,
-              zip: values.zip,
+              zip: `${values.zip}`,
               phoneNumber: values.phoneNumber,
             });
             history.push("/client/register/householdInfo");

@@ -69,7 +69,7 @@ export function ClientRegistrationHouseholdInfo() {
   const numEthnicitySelected =
     clientRegistrationState.householdInfo.numWhites +
     clientRegistrationState.householdInfo.numBlack +
-    clientRegistrationState.householdInfo.numAdults +
+    clientRegistrationState.householdInfo.numAsian +
     clientRegistrationState.householdInfo.numHispanic +
     clientRegistrationState.householdInfo.numOtherEthnicity;
 
