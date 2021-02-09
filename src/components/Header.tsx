@@ -23,17 +23,15 @@ export function Header(p: {}) {
         alignItems: "center",
       }}
     >
-      {!window.location.href.includes("home") ? (
-        <View style={{ position: "absolute", top: 0, left: 0, padding: 20 }}>
-          <TouchableOpacity
-            onPress={() => {
-              history.push("/home");
-            }}
-          >
-            <HomeIcon style={{ color: COLORS.onPrimary }} />
-          </TouchableOpacity>
-        </View>
-      ) : null}
+      <View style={{ position: "absolute", top: 0, left: 0, padding: 20 }}>
+        <TouchableOpacity
+          onPress={() => {
+            history.push("/home");
+          }}
+        >
+          <HomeIcon style={{ color: COLORS.onPrimary }} />
+        </TouchableOpacity>
+      </View>
       <StyledText
         style={{ color: COLORS.onPrimary, fontSize: isMobileDevice ? 18 : 36 }}
       >
