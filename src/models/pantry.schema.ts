@@ -1,7 +1,7 @@
 export interface Pantry {
   id: string;
   name: string;
-  address1: string;
+  address: string;
   address2?: string;
   city: string;
   state: string;

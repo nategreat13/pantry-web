@@ -67,7 +67,7 @@ export function ClientRegistrationHouseholdInfo() {
     clientRegistrationState.householdInfo.numOtherGender;
 
   const numEthnicitySelected =
-    clientRegistrationState.householdInfo.numWhites +
+    clientRegistrationState.householdInfo.numWhite +
     clientRegistrationState.householdInfo.numBlack +
     clientRegistrationState.householdInfo.numAsian +
     clientRegistrationState.householdInfo.numHispanic +
@@ -268,17 +268,17 @@ export function ClientRegistrationHouseholdInfo() {
           </Grid>
           <Grid item xs={12} sm={6}>
             <FormControl variant="filled" className={classes.formControl}>
-              <InputLabel id="numWhites"># White</InputLabel>
+              <InputLabel id="numWhite"># White</InputLabel>
               <Select
-                labelId="numWhites"
-                id="numWhites"
+                labelId="numWhite"
+                id="numWhite"
                 type="number"
-                value={clientRegistrationState.householdInfo.numWhites}
+                value={clientRegistrationState.householdInfo.numWhite}
                 onChange={(e) => {
                   setClientRegistrationState({
                     householdInfo: {
                       ...clientRegistrationState.householdInfo,
-                      ...{ numWhites: e.target.value as number },
+                      ...{ numWhite: e.target.value as number },
                     },
                   });
                 }}
@@ -431,11 +431,13 @@ export function ClientRegistrationHouseholdInfo() {
           disabled={!isValid}
           className={classes.submit}
           onClick={async () => {
-            const clientId = await registerClient({
+            const client = await registerClient({
               client: clientRegistrationState,
             });
-            setClientRegistrationState({ id: `${clientId}` });
-            history.replace("/client/register/success");
+            if (client) {
+              setClientRegistrationState({ id: `${client.id}` });
+              history.replace("/client/register/success");
+            }
           }}
         >
           Register

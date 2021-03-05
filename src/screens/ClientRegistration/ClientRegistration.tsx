@@ -55,7 +55,7 @@ export function ClientRegistration() {
           initialValues={{
             firstName: clientRegistrationState.firstName,
             lastName: clientRegistrationState.lastName,
-            address1: clientRegistrationState.address1,
+            address: clientRegistrationState.address,
             address2: clientRegistrationState.address2,
             city: clientRegistrationState.city,
             state: clientRegistrationState.state,
@@ -66,7 +66,7 @@ export function ClientRegistration() {
             setClientRegistrationState({
               firstName: values.firstName,
               lastName: values.lastName,
-              address1: values.address1,
+              address: values.address,
               address2: values.address2,
               city: values.city,
               state: values.state,
@@ -78,7 +78,7 @@ export function ClientRegistration() {
           validationSchema={Yup.object().shape({
             firstName: Yup.string().required(),
             lastName: Yup.string().required(),
-            address1: Yup.string().required(),
+            address: Yup.string().required(),
             city: Yup.string().required(),
             state: Yup.string().required(),
             zip: Yup.number().required(),
@@ -130,14 +130,14 @@ export function ClientRegistration() {
                 <Grid item xs={12}>
                   <TextField
                     required
-                    id="address1"
-                    name="address1"
-                    label="Address line 1"
+                    id="address"
+                    name="address"
+                    label="Address"
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
                     }}
-                    value={values.address1}
+                    value={values.address}
                     fullWidth
                     autoComplete="shipping address-line1"
                     variant="outlined"

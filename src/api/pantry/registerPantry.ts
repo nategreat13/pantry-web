@@ -1,5 +1,5 @@
 import { Pantry } from "../../models/pantry.schema";
-import { getFirestoreHelper } from "../../services/firebase.service";
+import { getPantryFirestore } from "../../services/firebase.service";
 import { getNewPantryId } from "./getNewPantryId";
 
 export async function registerPantry(p: {
@@ -21,7 +21,7 @@ export async function registerPantry(p: {
     },
   };
 
-  await getFirestoreHelper().Pantry.add({ item: pantryToAdd });
+  await getPantryFirestore().Pantry.add({ doc: pantryToAdd });
 
   return id;
 }

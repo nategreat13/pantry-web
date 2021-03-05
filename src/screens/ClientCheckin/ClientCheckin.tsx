@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -13,6 +13,8 @@ import { useGlobalContext } from "../../global/globalState";
 import { COLORS } from "../../constants/COLORS";
 import { checkInClient } from "../../api/clientCheckIn/checkInClient";
 import { StyledText } from "../../components/StyledText";
+import { useHistory } from "react-router-dom";
+import { TouchableOpacity } from "react-native-web";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -39,20 +41,34 @@ export function ClientCheckin() {
   const [globalState] = useGlobalContext();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const history = useHistory();
+  const [showUploadButton, setShowUploadButton] = useState(false);
+
+  useEffect(() => {
+    if (!globalState.user) {
+      history.replace("/pantry/login");
+    }
+  }, []);
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
       <CssBaseline />
       <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <CheckinIcon />
-        </Avatar>
+        <TouchableOpacity
+          onLongPress={() => {
+            setShowUploadButton(true);
+          }}
+        >
+          <Avatar className={classes.avatar}>
+            <CheckinIcon />
+          </Avatar>
+        </TouchableOpacity>
         <Typography variant="h5">Client Check-in</Typography>
         <Formik
           initialValues={{
             clientId: "",
           }}
-          onSubmit={async (values) => {
+          onSubmit={async (values, { resetForm }) => {
             setErrorMessage("");
             setSuccessMessage("");
             if (globalState.user) {
@@ -65,8 +81,15 @@ export function ClientCheckin() {
                 setErrorMessage("Client not found. Please check the Client ID");
               } else {
                 setSuccessMessage(
-                  `Successful Check-in:\nClient Name: ${checkin.client.firstName} ${checkin.client.lastName}`
+                  `Successful Check-in:\nClient Name: ${
+                    checkin.client.firstName
+                  } ${checkin.client.lastName}\n# of People in household: ${
+                    checkin.client.householdInfo.numAdults +
+                    checkin.client.householdInfo.numKids +
+                    checkin.client.householdInfo.numSeniors
+                  }`
                 );
+                resetForm();
               }
             }
           }}
@@ -119,6 +142,60 @@ export function ClientCheckin() {
             </form>
           )}
         </Formik>
+        <StyledText
+          style={{ color: COLORS.primary, marginBottom: 8, marginTop: 16 }}
+        >
+          New Client?
+        </StyledText>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+          }}
+          onClick={() => {
+            history.push("/client/register");
+          }}
+        >
+          Register Client
+        </Button>
+        <StyledText
+          style={{ color: COLORS.primary, marginTop: 16, marginBottom: 8 }}
+        >
+          Forgot your Pantry ID?
+        </StyledText>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+          }}
+          onClick={() => {
+            history.push("/client/lookup");
+          }}
+        >
+          Lookup Client ID
+        </Button>
+        {showUploadButton ? (
+          <Button
+            fullWidth
+            variant="contained"
+            style={{
+              backgroundColor: COLORS.primary,
+              color: COLORS.buttonTextColor,
+              marginTop: 16,
+            }}
+            onClick={() => {
+              history.push("/client/upload");
+            }}
+          >
+            Upload Existing Clients
+          </Button>
+        ) : null}
       </div>
     </Container>
   );

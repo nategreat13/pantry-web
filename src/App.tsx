@@ -6,22 +6,21 @@ import {
   useHistory,
 } from "react-router-dom";
 import { Header } from "./components/Header";
-import { GlobalContextProvider } from "./global/globalState";
+import { GlobalContextProvider, useGlobalContext } from "./global/globalState";
 import { ClientCheckin } from "./screens/ClientCheckin/ClientCheckin";
 import { ClientLookup } from "./screens/ClientLookup/ClientLookup";
 import { ClientRegistrationHouseholdInfo } from "./screens/ClientRegistration/ClienRegistrationHouseholdInfo";
 import { ClientRegistration } from "./screens/ClientRegistration/ClientRegistration";
 import { ClientRegistrationProvider } from "./screens/ClientRegistration/ClientRegistrationState";
 import { ClientRegistrationSuccess } from "./screens/ClientRegistration/ClientRegistrationSuccess";
+import { ClientUpload } from "./screens/ClientUpload/ClientUpload";
 import { Home } from "./screens/Home";
 import { PantryLogin } from "./screens/PantryLogin/PantryLogin";
 import { PantryLookup } from "./screens/PantryLookup/PantryLookup";
 import { PantryRegistration } from "./screens/PantryRegistration/PantryRegistration";
 import { PantryRegistrationSuccess } from "./screens/PantryRegistration/PantryRegistrationSuccess";
-import { initFirebase } from "./services/firebase.service";
 
 export default function App() {
-  initFirebase();
   return (
     <GlobalContextProvider>
       <Router>
@@ -62,6 +61,9 @@ export default function App() {
               <Route exact path="/client/register/success">
                 <ClientRegistrationSuccess />
               </Route>
+              <Route exact path="/client/upload">
+                <ClientUpload />
+              </Route>
             </ClientRegistrationProvider>
           </Switch>
         </div>
@@ -72,8 +74,18 @@ export default function App() {
 
 function BaseRoute() {
   const history = useHistory();
+  const [globalState, setGlobalState] = useGlobalContext();
   useEffect(() => {
-    history.push("/home");
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      if (user) {
+        setGlobalState({ user });
+        history.push("/client/checkin");
+      }
+    } else {
+      history.push("/pantry/login");
+    }
   }, []);
   return null;
 }

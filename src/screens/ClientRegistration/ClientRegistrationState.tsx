@@ -26,7 +26,7 @@ export function ClientRegistrationProvider(p: { children?: ReactNode }) {
   ] = useImmutableState<Client>({
     id: "",
     registrationDate: 0,
-    address1: "",
+    address: "",
     address2: "",
     city: "",
     firstName: "",
@@ -40,7 +40,7 @@ export function ClientRegistrationProvider(p: { children?: ReactNode }) {
       numMales: 0,
       numFemales: 0,
       numOtherGender: 0,
-      numWhites: 0,
+      numWhite: 0,
       numBlack: 0,
       numHispanic: 0,
       numAsian: 0,

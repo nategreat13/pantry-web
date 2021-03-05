@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -15,6 +15,12 @@ import { getPantry } from "../../api/pantry/getPantry";
 import { useGlobalContext } from "../../global/globalState";
 import { COLORS } from "../../constants/COLORS";
 import { StyledText } from "../../components/StyledText";
+import {
+  FormControl,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+} from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,6 +48,20 @@ export function PantryLogin() {
   const [globalState, setGlobalState] = useGlobalContext();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [selectedRadioButton, setSelectedRadioButton] = useState<
+    "volunteer" | "admin"
+  >("volunteer");
+
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("user");
+    if (loggedInUser) {
+      const user = JSON.parse(loggedInUser);
+      if (user) {
+        setGlobalState({ user });
+        history.push("/client/checkin");
+      }
+    }
+  }, []);
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
@@ -50,7 +70,35 @@ export function PantryLogin() {
         <Avatar className={classes.avatar}>
           <LockIcon />
         </Avatar>
-        <Typography variant="h5">Pantry Login</Typography>
+        <Typography variant="h5">Login</Typography>
+        <FormControl component="fieldset">
+          <RadioGroup
+            row
+            aria-label="position"
+            name="position"
+            style={{ marginTop: 8 }}
+            value={selectedRadioButton}
+            onChange={(event) => {
+              if (
+                event.target.value === "volunteer" ||
+                event.target.value === "admin"
+              ) {
+                setSelectedRadioButton(event.target.value);
+              }
+            }}
+          >
+            <FormControlLabel
+              value="volunteer"
+              control={<Radio color="primary" />}
+              label="Volunteer"
+            />
+            <FormControlLabel
+              value="admin"
+              control={<Radio color="primary" />}
+              label="Admin"
+            />
+          </RadioGroup>
+        </FormControl>
         <Formik
           initialValues={{
             pantryId: "",
@@ -65,19 +113,32 @@ export function PantryLogin() {
               setErrorMessage("Invalid Pantry ID");
               return;
             }
-            if (pantry.password !== values.password) {
+            if (
+              selectedRadioButton === "volunteer" &&
+              pantry.password !== values.password
+            ) {
               setErrorMessage("Incorrect Password");
               return;
             }
+            if (
+              selectedRadioButton === "admin" &&
+              pantry.adminPassword !== values.password
+            ) {
+              setErrorMessage("Incorrect Password");
+              return;
+            }
+            const user = {
+              firstName: values.firstName,
+              lastName: values.lastName,
+              email: values.email,
+              pantry,
+              isAdmin: selectedRadioButton === "admin",
+            };
             setGlobalState({
-              user: {
-                firstName: values.firstName,
-                lastName: values.lastName,
-                email: values.email,
-                pantry,
-              },
+              user,
             });
-            history.goBack();
+            localStorage.setItem("user", JSON.stringify(user));
+            history.push("/client/checkin");
           }}
           validationSchema={Yup.object().shape({
             pantryId: Yup.number().required(),
@@ -119,7 +180,11 @@ export function PantryLogin() {
                     required
                     id="password"
                     name="password"
-                    label="Password"
+                    label={
+                      selectedRadioButton === "volunteer"
+                        ? "Password"
+                        : "Admin Password"
+                    }
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
@@ -206,6 +271,44 @@ export function PantryLogin() {
             </form>
           )}
         </Formik>
+        <StyledText
+          style={{ color: COLORS.primary, marginBottom: 8, marginTop: 16 }}
+        >
+          New? Register your pantry to get started.
+        </StyledText>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+          }}
+          onClick={() => {
+            history.push("/pantry/register");
+          }}
+        >
+          Register Your Pantry
+        </Button>
+        <StyledText
+          style={{ color: COLORS.primary, marginTop: 16, marginBottom: 8 }}
+        >
+          Forgot your Pantry ID?
+        </StyledText>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+          }}
+          onClick={() => {
+            history.push("/pantry/lookup");
+          }}
+        >
+          Lookup Pantry ID
+        </Button>
       </div>
     </Container>
   );

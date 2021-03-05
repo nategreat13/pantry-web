@@ -49,7 +49,7 @@ export function PantryRegistration() {
         <Formik
           initialValues={{
             name: "",
-            address1: "",
+            address: "",
             address2: "",
             city: "",
             state: "",
@@ -62,7 +62,7 @@ export function PantryRegistration() {
             const pantryId = await registerPantry({
               pantry: {
                 name: values.name,
-                address1: values.address1,
+                address: values.address,
                 address2: values.address2,
                 city: values.city,
                 state: values.state,
@@ -76,7 +76,7 @@ export function PantryRegistration() {
           }}
           validationSchema={Yup.object().shape({
             name: Yup.string().required(),
-            address1: Yup.string().required(),
+            address: Yup.string().required(),
             city: Yup.string().required(),
             state: Yup.string().required(),
             zip: Yup.number().required(),
@@ -112,14 +112,14 @@ export function PantryRegistration() {
                 <Grid item xs={12}>
                   <TextField
                     required
-                    id="address1"
-                    name="address1"
-                    label="Address line 1"
+                    id="address"
+                    name="address"
+                    label="Address"
                     onBlur={handleBlur}
                     onChange={(e) => {
                       handleChange(e);
                     }}
-                    value={values.address1}
+                    value={values.address}
                     fullWidth
                     autoComplete="shipping address-line1"
                     variant="outlined"

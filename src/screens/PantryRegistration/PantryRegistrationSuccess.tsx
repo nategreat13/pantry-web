@@ -4,8 +4,10 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import CheckIcon from "@material-ui/icons/Check";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Typography } from "@material-ui/core";
-import { useParams } from "react-router-dom";
+import { Button, Typography } from "@material-ui/core";
+import { useHistory, useParams } from "react-router-dom";
+import { StyledText } from "../../components/StyledText";
+import { COLORS } from "../../constants/COLORS";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -23,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 export function PantryRegistrationSuccess() {
   const classes = useStyles();
   const { pantryId } = useParams<any>();
+  const history = useHistory();
 
   return (
     <Container component="main" maxWidth="sm">
@@ -31,9 +34,30 @@ export function PantryRegistrationSuccess() {
         <Avatar className={classes.avatar}>
           <CheckIcon />
         </Avatar>
-        <Typography>Success!</Typography>
-        <Typography>Your Pantry ID is:</Typography>
-        <Typography>{pantryId}</Typography>
+        <StyledText>Success!</StyledText>
+        <StyledText>Your Pantry ID is:</StyledText>
+        <StyledText style={{ fontSize: 24, marginTop: 12, marginBottom: 12 }}>
+          {pantryId}
+        </StyledText>
+        <StyledText>
+          Keep track of this ID, the password, and the admin password.
+        </StyledText>
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          style={{
+            backgroundColor: COLORS.primary,
+            color: COLORS.buttonTextColor,
+            marginTop: 16,
+          }}
+          onClick={() => {
+            history.replace("/pantry/login");
+          }}
+        >
+          Got it
+        </Button>
       </div>
     </Container>
   );

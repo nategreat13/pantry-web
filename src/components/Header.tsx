@@ -18,7 +18,7 @@ export function Header(p: {}) {
     <View
       style={{
         backgroundColor: COLORS.primary,
-        height: 100,
+        height: 120,
         justifyContent: "center",
         alignItems: "center",
       }}
@@ -26,7 +26,11 @@ export function Header(p: {}) {
       <View style={{ position: "absolute", top: 0, left: 0, padding: 20 }}>
         <TouchableOpacity
           onPress={() => {
-            history.push("/home");
+            if (globalState.user) {
+              history.push("/client/checkin");
+            } else {
+              history.push("/pantry/login");
+            }
           }}
         >
           <HomeIcon style={{ color: COLORS.onPrimary }} />
@@ -42,7 +46,7 @@ export function Header(p: {}) {
           position: "absolute",
           right: 0,
           top: 0,
-          height: 100,
+          height: 120,
           padding: 20,
         }}
       >
@@ -67,6 +71,11 @@ export function Header(p: {}) {
             <StyledText
               style={{ color: COLORS.onPrimary, marginBottom: 4 }}
             >{`${globalState.user.firstName} ${globalState.user.lastName}`}</StyledText>
+            <StyledText
+              style={{ color: COLORS.onPrimary, marginBottom: 4 }}
+            >{`${
+              globalState.user.isAdmin ? "Admin" : "Volunteer"
+            }`}</StyledText>
             <StyledText style={{ color: COLORS.onPrimary, marginBottom: 4 }}>
               {globalState.user.pantry.name}
             </StyledText>
@@ -80,6 +89,8 @@ export function Header(p: {}) {
                 setGlobalState({
                   user: undefined,
                 });
+                localStorage.removeItem("user");
+                history.replace("/pantry/login");
               }}
             >
               <LogoutIcon style={{ color: COLORS.onPrimary }} />

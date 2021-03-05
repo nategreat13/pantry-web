@@ -9,7 +9,7 @@ export enum COLORS {
   buttonTextColor = "#fff",
   primary = "#123456",
   secondary = "#654321",
-  onPrimary = "#cccccc",
+  onPrimary = "#eeeeee",
   onSecondary = "#234524",
   onBackground = "#987654",
   surface = "#bcdbcd",

@@ -1,4 +1,4 @@
-import { getFirestoreHelper } from "../../services/firebase.service";
+import { getPantryFirestore } from "../../services/firebase.service";
 
 export async function getNewPantryId() {
   let validId: number | undefined = undefined;
@@ -6,10 +6,10 @@ export async function getNewPantryId() {
     const possibleId = Math.floor(100000 + Math.random() * 899999);
 
     const existingPantries = (
-      await getFirestoreHelper().Pantry.query({
+      await getPantryFirestore().Pantry.query({
         where: [{ id: ["==", `${possibleId}`] }],
       })
-    ).items;
+    ).docs;
 
     if (!existingPantries.length) {
       validId = possibleId;

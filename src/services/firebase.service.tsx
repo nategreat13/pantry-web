@@ -1,35 +1,36 @@
 import firebase from "firebase";
+import { createFirestoreLift, FirestoreLiftCollection } from "firebase-lift";
 import { firebaseConfig } from "../config/firebase.config";
-import {
-  FirestoreHelper,
-  generateFirestoreHelper,
-} from "../helpers/FirestoreHelper";
+import { Client } from "../models/client.schema";
+import { ClientCheckin } from "../models/clientCheckin.schema";
+import { Pantry } from "../models/pantry.schema";
 
 let app: firebase.app.App;
-let firestoreHelper: FirestoreHelper;
 
-export function getFirebase() {
-  if (!app) {
-    throw new Error("Firebase has not been initialized");
-  }
-  return app;
-}
+require("firebase/auth");
+require("firebase/firestore");
+app = firebase.initializeApp(firebaseConfig);
 
-export function getFirestoreHelper() {
-  if (!firestoreHelper) {
-    throw new Error("FirestoreHelper has not been initialized");
-  }
-  return firestoreHelper;
-}
+const pantryFirestore = createFirestoreLift<{
+  Client: FirestoreLiftCollection<Client>;
+  Pantry: FirestoreLiftCollection<Pantry>;
+  ClientCheckin: FirestoreLiftCollection<ClientCheckin>;
+}>({
+  collections: {
+    Client: {
+      collection: "Client",
+    },
+    Pantry: {
+      collection: "Pantry",
+    },
+    ClientCheckin: {
+      collection: "ClientCheckin",
+    },
+  },
+  firebaseApp: app,
+  firestoreModule: firebase.firestore,
+});
 
-export function initFirebase() {
-  if (!firebase.apps.length) {
-    require("firebase/auth");
-    require("firebase/firestore");
-    app = firebase.initializeApp(firebaseConfig);
-    firestoreHelper = generateFirestoreHelper({
-      firestoreModule: firebase.firestore,
-      app: app,
-    });
-  }
+export function getPantryFirestore() {
+  return pantryFirestore;
 }

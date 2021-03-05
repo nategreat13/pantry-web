@@ -13,6 +13,7 @@ import { COLORS } from "../../constants/COLORS";
 import { StyledText } from "../../components/StyledText";
 import { Pantry } from "../../models/pantry.schema";
 import { lookupPantry } from "../../api/pantry/lookupPantry";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,6 +41,7 @@ export function PantryLookup() {
   const [successMessage, setSuccessMessage] = useState("");
   const [possiblePantries, setpossiblePantries] = useState<Pantry[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const history = useHistory();
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
@@ -76,7 +78,7 @@ export function PantryLookup() {
                   <TextField
                     fullWidth
                     id="name"
-                    label="Pantry Name"
+                    label="Pantry Name (Optional)"
                     name="name"
                     onBlur={handleBlur}
                     onChange={(e) => {
@@ -91,7 +93,7 @@ export function PantryLookup() {
                   <TextField
                     fullWidth
                     id="zip"
-                    label="Zip Code"
+                    label="Zip Code (Optional)"
                     name="zip"
                     onBlur={handleBlur}
                     onChange={(e) => {
@@ -116,7 +118,7 @@ export function PantryLookup() {
                 className={classes.submit}
                 disabled={!(values.name || values.zip)}
               >
-                Lookup Client
+                Lookup Pantry
               </Button>
               {errorMessage ? (
                 <StyledText style={{ color: COLORS.buttonNegativeColor }}>
@@ -145,6 +147,21 @@ export function PantryLookup() {
           </StyledText>
         ) : null}
       </div>
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        style={{
+          backgroundColor: COLORS.primary,
+          color: COLORS.buttonTextColor,
+        }}
+        className={classes.submit}
+        onClick={() => {
+          history.goBack();
+        }}
+      >
+        Back
+      </Button>
     </Container>
   );
 }

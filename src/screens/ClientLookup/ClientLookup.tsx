@@ -14,6 +14,7 @@ import { StyledText } from "../../components/StyledText";
 import { lookupClient } from "../../api/client/lookupClient";
 import { Client } from "../../models/client.schema";
 import _ from "lodash";
+import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -41,6 +42,7 @@ export function ClientLookup() {
   const [successMessage, setSuccessMessage] = useState("");
   const [possibleClients, setPossibleClients] = useState<Client[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const history = useHistory();
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
@@ -79,7 +81,7 @@ export function ClientLookup() {
                   <TextField
                     fullWidth
                     id="firstName"
-                    label="First Name"
+                    label="First Name (Optional)"
                     name="firstName"
                     onBlur={handleBlur}
                     onChange={(e) => {
@@ -94,7 +96,7 @@ export function ClientLookup() {
                   <TextField
                     fullWidth
                     id="lastName"
-                    label="Last Name"
+                    label="Last Name (Optional)"
                     name="lastName"
                     onBlur={handleBlur}
                     onChange={(e) => {
@@ -109,7 +111,7 @@ export function ClientLookup() {
                   <TextField
                     fullWidth
                     id="zip"
-                    label="Zip Code"
+                    label="Zip Code (Optional)"
                     name="zip"
                     onBlur={handleBlur}
                     onChange={(e) => {
@@ -167,6 +169,21 @@ export function ClientLookup() {
           </StyledText>
         ) : null}
       </div>
+      <Button
+        type="submit"
+        fullWidth
+        variant="contained"
+        style={{
+          backgroundColor: COLORS.primary,
+          color: COLORS.buttonTextColor,
+        }}
+        className={classes.submit}
+        onClick={() => {
+          history.goBack();
+        }}
+      >
+        Back
+      </Button>
     </Container>
   );
 }

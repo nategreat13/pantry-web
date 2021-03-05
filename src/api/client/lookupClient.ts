@@ -1,6 +1,6 @@
-import { OptionalQuery } from "firestore-lift/dist/src/models";
+import { OptionalQuery } from "firebase-lift";
 import { Client } from "../../models/client.schema";
-import { getFirestoreHelper } from "../../services/firebase.service";
+import { getPantryFirestore } from "../../services/firebase.service";
 
 export async function lookupClient(p: {
   firstName?: string;
@@ -22,10 +22,10 @@ export async function lookupClient(p: {
     queryParams.push({ zip: ["==", p.zip] });
   }
   const results = (
-    await getFirestoreHelper().Client.query({
+    await getPantryFirestore().Client.query({
       where: queryParams,
     })
-  ).items;
+  ).docs;
 
   return results;
 }

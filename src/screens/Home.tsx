@@ -26,11 +26,10 @@ export function Home() {
   const classes = useStyles();
   const mobileDevice = useMediaQuery(theme.breakpoints.down("sm"));
   let history = useHistory();
-  const [globalState, setGlobalState] = useGlobalContext();
+  const [globalState] = useGlobalContext();
 
   return (
     <Container component="main" maxWidth="sm">
-      {/* <CssBaseline /> */}
       <div className={classes.paper}>
         <Grid container spacing={2}>
           {!globalState.user ? (

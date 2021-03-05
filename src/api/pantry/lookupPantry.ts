@@ -1,6 +1,6 @@
-import { OptionalQuery } from "firestore-lift/dist/src/models";
+import { OptionalQuery } from "firebase-lift";
 import { Pantry } from "../../models/pantry.schema";
-import { getFirestoreHelper } from "../../services/firebase.service";
+import { getPantryFirestore } from "../../services/firebase.service";
 
 export async function lookupPantry(p: { name?: string; zip?: string }) {
   const queryParams: OptionalQuery<Pantry>[] = [];
@@ -25,10 +25,10 @@ export async function lookupPantry(p: { name?: string; zip?: string }) {
     queryParams.push({ zip: ["==", p.zip] });
   }
   const results = (
-    await getFirestoreHelper().Pantry.query({
+    await getPantryFirestore().Pantry.query({
       where: queryParams,
     })
-  ).items;
+  ).docs;
 
   return results;
 }
