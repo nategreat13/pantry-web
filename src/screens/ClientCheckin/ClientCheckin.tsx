@@ -15,6 +15,9 @@ import { checkInClient } from "../../api/clientCheckIn/checkInClient";
 import { StyledText } from "../../components/StyledText";
 import { useHistory } from "react-router-dom";
 import { TouchableOpacity } from "react-native-web";
+import { Client } from "../../models/client.schema";
+import { lookupClient } from "../../api/client/lookupClient";
+import _ from "lodash";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -43,7 +46,9 @@ export function ClientCheckin() {
   const [successMessage, setSuccessMessage] = useState("");
   const history = useHistory();
   const [showUploadButton, setShowUploadButton] = useState(false);
-
+  const [lookupErrorMessage, setLookupErrorMessage] = useState("");
+  const [possibleClients, setPossibleClients] = useState<Client[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   useEffect(() => {
     if (!globalState.user) {
       history.replace("/pantry/login");
@@ -161,25 +166,125 @@ export function ClientCheckin() {
         >
           Register Client
         </Button>
-        <StyledText
-          style={{ color: COLORS.primary, marginTop: 16, marginBottom: 8 }}
-        >
-          Forgot your Pantry ID?
-        </StyledText>
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          style={{
-            backgroundColor: COLORS.primary,
-            color: COLORS.buttonTextColor,
+
+        <Typography style={{ marginTop: 48 }} variant="h5">
+          Client ID Lookup
+        </Typography>
+        <Formik
+          initialValues={{
+            firstName: "",
+            lastName: "",
+            zip: "",
           }}
-          onClick={() => {
-            history.push("/client/lookup");
+          onSubmit={async (values) => {
+            setErrorMessage("");
+
+            const possibleClients = await lookupClient({
+              firstName: _.capitalize(values.firstName),
+              lastName: _.capitalize(values.lastName),
+              zip: _.capitalize(values.zip),
+            });
+
+            setPossibleClients(possibleClients);
+            if (!hasSearched) {
+              setHasSearched(true);
+            }
           }}
         >
-          Lookup Client ID
-        </Button>
+          {({ handleBlur, handleChange, handleSubmit, values }) => (
+            <form className={classes.form} noValidate onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    id="firstName"
+                    label="First Name (Optional)"
+                    name="firstName"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    type="string"
+                    value={values.firstName}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    id="lastName"
+                    label="Last Name (Optional)"
+                    name="lastName"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    type="string"
+                    value={values.lastName}
+                    variant="outlined"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    id="zip"
+                    label="Zip Code (Optional)"
+                    name="zip"
+                    onBlur={handleBlur}
+                    onChange={(e) => {
+                      handleChange(e);
+                    }}
+                    type="number"
+                    value={values.zip}
+                    variant="outlined"
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                style={{
+                  backgroundColor: !(
+                    values.firstName ||
+                    values.lastName ||
+                    values.zip
+                  )
+                    ? COLORS.surface
+                    : COLORS.primary,
+                  color: COLORS.buttonTextColor,
+                }}
+                className={classes.submit}
+                disabled={!(values.firstName || values.lastName || values.zip)}
+              >
+                Lookup Client
+              </Button>
+              {errorMessage ? (
+                <StyledText style={{ color: COLORS.buttonNegativeColor }}>
+                  {errorMessage}
+                </StyledText>
+              ) : null}
+              {successMessage ? (
+                <StyledText style={{ color: COLORS.buttonPositiveColor }}>
+                  {successMessage}
+                </StyledText>
+              ) : null}
+            </form>
+          )}
+        </Formik>
+
+        {possibleClients.length ? (
+          <Grid container spacing={2}>
+            <PossibleClientRow type={"header"} />
+            {possibleClients.map((client) => {
+              return <PossibleClientRow type={"client"} client={client} />;
+            })}
+          </Grid>
+        ) : hasSearched ? (
+          <StyledText style={{ color: COLORS.buttonNegativeColor }}>
+            No Clients Found
+          </StyledText>
+        ) : null}
         {showUploadButton ? (
           <Button
             fullWidth
@@ -198,5 +303,41 @@ export function ClientCheckin() {
         ) : null}
       </div>
     </Container>
+  );
+}
+
+function PossibleClientRow(
+  p:
+    | {
+        type: "header";
+      }
+    | {
+        type: "client";
+        client: Client;
+      }
+) {
+  return (
+    <>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Client ID" : p.client.id}
+        </StyledText>
+      </Grid>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "First Name" : p.client.firstName}
+        </StyledText>
+      </Grid>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Last Name" : p.client.lastName}
+        </StyledText>
+      </Grid>
+      <Grid item xs={3}>
+        <StyledText variant={p.type === "header" ? "bold" : undefined}>
+          {p.type === "header" ? "Zip Code" : p.client.zip}
+        </StyledText>
+      </Grid>
+    </>
   );
 }
