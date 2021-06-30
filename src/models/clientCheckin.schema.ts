@@ -3,4 +3,6 @@ export interface ClientCheckin {
   clientId: string;
   pantryId: string;
   checkinDate: number;
+  volunteerName: string;
+  volunteerEmail: string;
 }

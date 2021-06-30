@@ -6,10 +6,15 @@ export async function lookupClient(p: {
   firstName?: string;
   lastName?: string;
   zip?: string;
+  pantryId: string;
 }) {
   const queryParams: OptionalQuery<Client>[] = [];
   if (!p.firstName && !p.lastName && !p.zip) {
     return [];
+  }
+
+  if (!(p.firstName && p.lastName)) {
+    queryParams.push({ registeredPantries: { [p.pantryId]: ["==", true] } });
   }
 
   if (p.firstName) {
@@ -21,6 +26,7 @@ export async function lookupClient(p: {
   if (p.zip) {
     queryParams.push({ zip: ["==", p.zip] });
   }
+
   const results = (
     await getPantryFirestore().Client.query({
       where: queryParams,

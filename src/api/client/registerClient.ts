@@ -25,3 +25,24 @@ export async function registerClient(p: {
     return undefined;
   }
 }
+
+export async function registerClientWithId(p: {
+  client: Omit<Client, "registrationDate">;
+}) {
+  try {
+    const clientToAdd: Client = {
+      ...p.client,
+      ...{
+        registrationDate: Date.now(),
+        firstName: _.capitalize(p.client.firstName),
+        lastName: _.capitalize(p.client.lastName),
+      },
+    };
+
+    await getPantryFirestore().Client.add({ doc: clientToAdd });
+
+    return clientToAdd;
+  } catch (e) {
+    return undefined;
+  }
+}

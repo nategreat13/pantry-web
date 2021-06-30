@@ -24,6 +24,7 @@ export interface Client {
   zip?: string;
   phoneNumber?: string;
   householdInfo: ClientHouseholdInfo;
+  registeredPantries?: Record<string, true>;
 }
 
 const ClientForKeys: Required<Client> = {
@@ -37,6 +38,7 @@ const ClientForKeys: Required<Client> = {
   zip: "",
   id: "",
   registrationDate: 0,
+  registeredPantries: {},
   householdInfo: {
     numAdults: 0,
     numKids: 0,

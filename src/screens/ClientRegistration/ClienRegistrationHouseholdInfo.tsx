@@ -19,6 +19,8 @@ import { registerClient } from "../../api/client/registerClient";
 import { useHistory } from "react-router-dom";
 import { COLORS } from "../../constants/COLORS";
 import Checkbox from "@material-ui/core/Checkbox";
+import { Client } from "../../models/client.schema";
+import { useGlobalContext } from "../../global/globalState";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -53,6 +55,7 @@ export function ClientRegistrationHouseholdInfo() {
     setClientRegistrationState,
   ] = useClientRegistrationContext();
   const [checked, setChecked] = useState(false);
+  const [globalState, setGlobalState] = useGlobalContext();
 
   const limit = 10;
 
@@ -431,9 +434,20 @@ export function ClientRegistrationHouseholdInfo() {
           disabled={!isValid}
           className={classes.submit}
           onClick={async () => {
+            let clientData: Omit<Client, "id" | "registrationDate"> = {
+              ...clientRegistrationState,
+            };
+
+            if (globalState.user) {
+              clientData.registeredPantries = {
+                [globalState.user.pantry.id]: true,
+              };
+            }
+
             const client = await registerClient({
-              client: clientRegistrationState,
+              client: clientData,
             });
+
             if (client) {
               setClientRegistrationState({ id: `${client.id}` });
               history.replace("/client/register/success");

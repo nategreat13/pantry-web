@@ -13,7 +13,10 @@ import { TouchableOpacity, View } from "react-native-web";
 import csv from "csvtojson";
 import { StyledText } from "../../components/StyledText";
 import { useGlobalContext } from "../../global/globalState";
-import { registerClient } from "../../api/client/registerClient";
+import {
+  registerClient,
+  registerClientWithId,
+} from "../../api/client/registerClient";
 import { CSVLink } from "react-csv";
 import moment from "moment";
 import { CircularProgress } from "@material-ui/core";
@@ -153,6 +156,10 @@ export function ClientUpload() {
                     setIsUploading(false);
                     return;
                   }
+
+                  if (!globalState.user?.pantry.id) {
+                    return;
+                  }
                   const keys = Object.keys(data[0]);
                   const missingFields: string[] = [];
                   ["firstName", "lastName", "address"].forEach((key) => {
@@ -202,6 +209,9 @@ export function ClientUpload() {
                         zip: convertStringToEachFirstLetterCapitalized(
                           clientData.zip ?? ""
                         ),
+                        registeredPantries: {
+                          [globalState.user?.pantry.id ?? ""]: true,
+                        },
                         householdInfo: {
                           numAdults: parseInt(clientData.numAdults),
                           numKids: parseInt(clientData.numKids),

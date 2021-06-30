@@ -68,6 +68,23 @@ export function ClientCheckin() {
             <CheckinIcon />
           </Avatar>
         </TouchableOpacity>
+        {showUploadButton ? (
+          <Button
+            fullWidth
+            variant="contained"
+            style={{
+              backgroundColor: COLORS.primary,
+              color: COLORS.buttonTextColor,
+              marginTop: 16,
+              marginBottom: 32,
+            }}
+            onClick={() => {
+              history.push("/client/upload");
+            }}
+          >
+            Upload Existing Clients
+          </Button>
+        ) : null}
         <Typography variant="h5">Client Check-in</Typography>
         <Formik
           initialValues={{
@@ -80,6 +97,8 @@ export function ClientCheckin() {
               const checkin = await checkInClient({
                 clientId: `${values.clientId}`,
                 pantry: globalState.user.pantry,
+                volunteerName: `${globalState.user.firstName} ${globalState.user.lastName}`,
+                volunteerEmail: globalState.user.email,
               });
 
               if (checkin === null) {
@@ -178,16 +197,18 @@ export function ClientCheckin() {
           }}
           onSubmit={async (values) => {
             setErrorMessage("");
+            if (globalState.user) {
+              const possibleClients = await lookupClient({
+                firstName: _.capitalize(values.firstName),
+                lastName: _.capitalize(values.lastName),
+                zip: _.capitalize(values.zip),
+                pantryId: globalState.user.pantry.id,
+              });
 
-            const possibleClients = await lookupClient({
-              firstName: _.capitalize(values.firstName),
-              lastName: _.capitalize(values.lastName),
-              zip: _.capitalize(values.zip),
-            });
-
-            setPossibleClients(possibleClients);
-            if (!hasSearched) {
-              setHasSearched(true);
+              setPossibleClients(possibleClients);
+              if (!hasSearched) {
+                setHasSearched(true);
+              }
             }
           }}
         >
@@ -264,11 +285,6 @@ export function ClientCheckin() {
                   {errorMessage}
                 </StyledText>
               ) : null}
-              {successMessage ? (
-                <StyledText style={{ color: COLORS.buttonPositiveColor }}>
-                  {successMessage}
-                </StyledText>
-              ) : null}
             </form>
           )}
         </Formik>
@@ -277,7 +293,13 @@ export function ClientCheckin() {
           <Grid container spacing={2}>
             <PossibleClientRow type={"header"} />
             {possibleClients.map((client) => {
-              return <PossibleClientRow type={"client"} client={client} />;
+              return (
+                <PossibleClientRow
+                  key={client.id}
+                  type={"client"}
+                  client={client}
+                />
+              );
             })}
           </Grid>
         ) : hasSearched ? (
@@ -285,8 +307,9 @@ export function ClientCheckin() {
             No Clients Found
           </StyledText>
         ) : null}
-        {showUploadButton ? (
+        {globalState.user && globalState.user.isAdmin ? (
           <Button
+            type="submit"
             fullWidth
             variant="contained"
             style={{
@@ -294,11 +317,9 @@ export function ClientCheckin() {
               color: COLORS.buttonTextColor,
               marginTop: 16,
             }}
-            onClick={() => {
-              history.push("/client/upload");
-            }}
+            onClick={() => history.push("/reports")}
           >
-            Upload Existing Clients
+            Reports
           </Button>
         ) : null}
       </div>

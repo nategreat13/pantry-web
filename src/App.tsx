@@ -8,17 +8,16 @@ import {
 import { Header } from "./components/Header";
 import { GlobalContextProvider, useGlobalContext } from "./global/globalState";
 import { ClientCheckin } from "./screens/ClientCheckin/ClientCheckin";
-import { ClientLookup } from "./screens/ClientLookup/ClientLookup";
 import { ClientRegistrationHouseholdInfo } from "./screens/ClientRegistration/ClienRegistrationHouseholdInfo";
 import { ClientRegistration } from "./screens/ClientRegistration/ClientRegistration";
 import { ClientRegistrationProvider } from "./screens/ClientRegistration/ClientRegistrationState";
 import { ClientRegistrationSuccess } from "./screens/ClientRegistration/ClientRegistrationSuccess";
 import { ClientUpload } from "./screens/ClientUpload/ClientUpload";
-import { Home } from "./screens/Home";
 import { PantryLogin } from "./screens/PantryLogin/PantryLogin";
 import { PantryLookup } from "./screens/PantryLookup/PantryLookup";
 import { PantryRegistration } from "./screens/PantryRegistration/PantryRegistration";
 import { PantryRegistrationSuccess } from "./screens/PantryRegistration/PantryRegistrationSuccess";
+import { Reports } from "./screens/Reports/Reports";
 
 export default function App() {
   return (
@@ -30,17 +29,11 @@ export default function App() {
             <Route exact path="/client/checkin">
               <ClientCheckin />
             </Route>
-            <Route exact path="/client/lookup">
-              <ClientLookup />
-            </Route>
             <Route exact path="/pantry/lookup">
               <PantryLookup />
             </Route>
             <Route exact path="/">
               <BaseRoute />
-            </Route>
-            <Route exact path="/home">
-              <Home />
             </Route>
             <Route exact path="/pantry/register">
               <PantryRegistration />
@@ -63,6 +56,9 @@ export default function App() {
               </Route>
               <Route exact path="/client/upload">
                 <ClientUpload />
+              </Route>
+              <Route exact path="/reports">
+                <Reports />
               </Route>
             </ClientRegistrationProvider>
           </Switch>
