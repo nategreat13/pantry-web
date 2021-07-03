@@ -108,7 +108,11 @@ export function Home() {
                 width: "100%",
               }}
               onClick={() => {
-                history.push("/client/register");
+                if (globalState.user) {
+                  history.push(
+                    `/client/register/${globalState.user.pantry.id}`
+                  );
+                }
               }}
             >
               Client Registration

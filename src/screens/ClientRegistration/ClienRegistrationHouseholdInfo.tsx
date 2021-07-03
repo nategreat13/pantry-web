@@ -16,7 +16,7 @@ import {
   FormControlLabel,
 } from "@material-ui/core";
 import { registerClient } from "../../api/client/registerClient";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import { COLORS } from "../../constants/COLORS";
 import Checkbox from "@material-ui/core/Checkbox";
 import { Client } from "../../models/client.schema";
@@ -50,12 +50,11 @@ const useStyles = makeStyles((theme) => ({
 export function ClientRegistrationHouseholdInfo() {
   const classes = useStyles();
   const history = useHistory();
-  const [
-    clientRegistrationState,
-    setClientRegistrationState,
-  ] = useClientRegistrationContext();
+  const [clientRegistrationState, setClientRegistrationState] =
+    useClientRegistrationContext();
   const [checked, setChecked] = useState(false);
   const [globalState, setGlobalState] = useGlobalContext();
+  const { pantryId } = useParams<any>();
 
   const limit = 10;
 
@@ -438,9 +437,9 @@ export function ClientRegistrationHouseholdInfo() {
               ...clientRegistrationState,
             };
 
-            if (globalState.user) {
+            if (pantryId) {
               clientData.registeredPantries = {
-                [globalState.user.pantry.id]: true,
+                [pantryId]: true,
               };
             }
 

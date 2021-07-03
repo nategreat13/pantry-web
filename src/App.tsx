@@ -45,10 +45,10 @@ export default function App() {
               <PantryLogin />
             </Route>
             <ClientRegistrationProvider>
-              <Route exact path="/client/register">
+              <Route exact path="/client/register/:pantryId">
                 <ClientRegistration />
               </Route>
-              <Route exact path="/client/register/householdInfo">
+              <Route exact path="/client/register/householdInfo/:pantryId">
                 <ClientRegistrationHouseholdInfo />
               </Route>
               <Route exact path="/client/register/success">

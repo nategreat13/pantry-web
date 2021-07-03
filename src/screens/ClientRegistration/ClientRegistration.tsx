@@ -9,7 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { Formik } from "formik";
-import { useHistory } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import * as Yup from "yup";
 import { useClientRegistrationContext } from "./ClientRegistrationState";
 import { COLORS } from "../../constants/COLORS";
@@ -37,11 +37,10 @@ const useStyles = makeStyles((theme) => ({
 export function ClientRegistration() {
   const classes = useStyles();
   const history = useHistory();
+  const { pantryId } = useParams<any>();
 
-  const [
-    clientRegistrationState,
-    setClientRegistrationState,
-  ] = useClientRegistrationContext();
+  const [clientRegistrationState, setClientRegistrationState] =
+    useClientRegistrationContext();
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
@@ -73,7 +72,7 @@ export function ClientRegistration() {
               zip: `${values.zip}`,
               phoneNumber: values.phoneNumber,
             });
-            history.push("/client/register/householdInfo");
+            history.push(`/client/register/householdInfo/${pantryId}`);
           }}
           validationSchema={Yup.object().shape({
             firstName: Yup.string().required(),

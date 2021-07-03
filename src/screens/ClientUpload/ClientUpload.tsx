@@ -176,6 +176,63 @@ export function ClientUpload() {
                     return;
                   }
 
+                  // const clientsToAdd: Omit<Client, "registrationDate">[] =
+                  //   _.compact(
+                  //     data.map((clientData) => {
+                  //       if (!clientData.firstName || !clientData.lastName) {
+                  //         return;
+                  //       }
+                  //       return {
+                  //         id: clientData.id,
+                  //         firstName: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.firstName
+                  //         ),
+                  //         lastName: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.lastName
+                  //         ),
+                  //         address: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.address ?? ""
+                  //         ),
+                  //         address2: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.address2 ?? ""
+                  //         ),
+                  //         city: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.city ?? ""
+                  //         ),
+                  //         phoneNumber:
+                  //           convertStringToEachFirstLetterCapitalized(
+                  //             clientData.phoneNumber ?? ""
+                  //           ),
+                  //         state: clientData.state ?? "",
+                  //         zip: convertStringToEachFirstLetterCapitalized(
+                  //           clientData.zip ?? ""
+                  //         ),
+                  //         registeredPantries: {
+                  //           [globalState.user?.pantry.id ?? ""]: true,
+                  //         },
+                  //         householdInfo: {
+                  //           numAdults: parseInt(clientData.numAdults ?? "0"),
+                  //           numKids: parseInt(clientData.numKids ?? "0"),
+                  //           numSeniors: parseInt(clientData.numSeniors ?? "0"),
+                  //           numMales: parseInt(clientData.numMales ?? "0"),
+                  //           numFemales: parseInt(clientData.numFemales ?? "0"),
+                  //           numOtherGender: parseInt(
+                  //             clientData.numOtherGender ?? "0"
+                  //           ),
+                  //           numWhite: parseInt(clientData.numWhite ?? "0"),
+                  //           numBlack: parseInt(clientData.numBlack ?? "0"),
+                  //           numAsian: parseInt(clientData.numAsian ?? "0"),
+                  //           numHispanic: parseInt(
+                  //             clientData.numHispanic ?? "0"
+                  //           ),
+                  //           numOtherEthnicity: parseInt(
+                  //             clientData.numOtherEthnicity ?? "0"
+                  //           ),
+                  //         },
+                  //       };
+                  //     })
+                  //   );
+
                   const clientsToAdd: Omit<
                     Client,
                     "id" | "registrationDate"
@@ -203,9 +260,7 @@ export function ClientUpload() {
                         phoneNumber: convertStringToEachFirstLetterCapitalized(
                           clientData.phoneNumber ?? ""
                         ),
-                        state: convertStringToEachFirstLetterCapitalized(
-                          clientData.state ?? ""
-                        ),
+                        state: clientData.state ?? "",
                         zip: convertStringToEachFirstLetterCapitalized(
                           clientData.zip ?? ""
                         ),
@@ -213,18 +268,20 @@ export function ClientUpload() {
                           [globalState.user?.pantry.id ?? ""]: true,
                         },
                         householdInfo: {
-                          numAdults: parseInt(clientData.numAdults),
-                          numKids: parseInt(clientData.numKids),
-                          numSeniors: parseInt(clientData.numSeniors),
-                          numMales: parseInt(clientData.numMales),
-                          numFemales: parseInt(clientData.numFemales),
-                          numOtherGender: parseInt(clientData.numOtherGender),
-                          numWhite: parseInt(clientData.numWhite),
-                          numBlack: parseInt(clientData.numBlack),
-                          numAsian: parseInt(clientData.numAsian),
-                          numHispanic: parseInt(clientData.numHispanic),
+                          numAdults: parseInt(clientData.numAdults ?? "0"),
+                          numKids: parseInt(clientData.numKids ?? "0"),
+                          numSeniors: parseInt(clientData.numSeniors ?? "0"),
+                          numMales: parseInt(clientData.numMales ?? "0"),
+                          numFemales: parseInt(clientData.numFemales ?? "0"),
+                          numOtherGender: parseInt(
+                            clientData.numOtherGender ?? "0"
+                          ),
+                          numWhite: parseInt(clientData.numWhite ?? "0"),
+                          numBlack: parseInt(clientData.numBlack ?? "0"),
+                          numAsian: parseInt(clientData.numAsian ?? "0"),
+                          numHispanic: parseInt(clientData.numHispanic ?? "0"),
                           numOtherEthnicity: parseInt(
-                            clientData.numOtherEthnicity
+                            clientData.numOtherEthnicity ?? "0"
                           ),
                         },
                       };
@@ -256,6 +313,7 @@ export function ClientUpload() {
                           client.householdInfo
                         );
                         delete clientData.householdInfo;
+                        delete clientData.registeredPantries;
                         clientData.registrationDate = moment(
                           clientData.registrationDate
                         ).format("MM-DD-YYYY");

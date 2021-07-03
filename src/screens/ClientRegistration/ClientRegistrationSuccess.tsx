@@ -52,6 +52,7 @@ export function ClientRegistrationSuccess() {
             backgroundColor: COLORS.primary,
             color: COLORS.buttonTextColor,
             marginTop: 16,
+            marginBottom: 64,
           }}
           onClick={() => {
             history.replace("/pantry/login");

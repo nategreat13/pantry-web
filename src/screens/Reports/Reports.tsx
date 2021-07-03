@@ -18,6 +18,14 @@ import { CSVLink } from "react-csv";
 import moment from "moment";
 import { Button, TextField, Grid } from "@material-ui/core";
 import { getAllPantryClients } from "../../api/client/getAllPantryClients";
+import {
+  KeyboardDatePicker,
+  MuiPickersUtilsProvider,
+} from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
+import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
+import { getClientCheckinReport } from "../../api/clientCheckIn/getClientCheckinReport";
+import { checkInClient } from "../../api/clientCheckIn/checkInClient";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -51,9 +59,10 @@ export function Reports() {
   const [globalState, setGlobalState] = useGlobalContext();
   const [csvData, setCSVData] = useState<any[]>([]);
 
-  const [clientListStartDate, setClientListStartDate] = useState(
-    moment().startOf("M").valueOf()
+  const [startDateMS, setStartDateMS] = useState(
+    moment().startOf("M").startOf("D").valueOf()
   );
+  const [endDateMS, setEndDateMS] = useState(moment().endOf("D").valueOf());
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem("user");
@@ -67,97 +76,185 @@ export function Reports() {
 
   return (
     <Container component="main" maxWidth="sm" style={{ marginBottom: 48 }}>
-      <CssBaseline />
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <ReportsIcon />
-        </Avatar>
-        <Typography variant="h5">Reports</Typography>
+      <MuiPickersUtilsProvider libInstance={moment} utils={MomentUtils}>
+        <CssBaseline />
+        <div className={classes.paper}>
+          <Avatar className={classes.avatar}>
+            <ReportsIcon />
+          </Avatar>
+          <Typography variant="h5">Reports</Typography>
 
-        {errorMessage ? (
-          <StyledText style={{ color: COLORS.buttonNegativeColor }}>
-            {errorMessage}
-          </StyledText>
-        ) : null}
-        {successMessage ? (
-          <StyledText style={{ color: COLORS.buttonPositiveColor }}>
-            {successMessage}
-          </StyledText>
-        ) : null}
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              id="date-local"
-              label="Next appointment"
-              type="date"
-              defaultValue="2017-05-24"
-              value={moment(clientListStartDate).toDate()}
-              className={classes.textField}
-              InputLabelProps={{
-                shrink: true,
-              }}
-            />
-          </Grid>
-          <Button
-            fullWidth
-            variant="contained"
-            style={{
-              backgroundColor: COLORS.primary,
-              color: COLORS.buttonTextColor,
-              marginTop: 16,
-            }}
-            onClick={async () => {
-              if (globalState.user) {
-              }
-            }}
-          >
-            Get Client Checkin Report
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            style={{
-              backgroundColor: COLORS.primary,
-              color: COLORS.buttonTextColor,
-              marginTop: 16,
-            }}
-            onClick={async () => {
-              if (globalState.user) {
-                const clients = await getAllPantryClients({
-                  pantryId: globalState.user.pantry.id,
-                });
-                console.log(clients.length);
-                if (clients.length) {
-                  const data = clients.map((client) => {
-                    const clientData: any = _.merge(
-                      client,
-                      client.householdInfo
+          {errorMessage ? (
+            <StyledText style={{ color: COLORS.buttonNegativeColor }}>
+              {errorMessage}
+            </StyledText>
+          ) : null}
+          {successMessage ? (
+            <StyledText style={{ color: COLORS.buttonPositiveColor }}>
+              {successMessage}
+            </StyledText>
+          ) : null}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <KeyboardDatePicker
+                style={{ width: "100%" }}
+                autoOk={true}
+                showTodayButton={true}
+                value={moment(startDateMS).toDate()}
+                format="YYYY-MM-DD"
+                onChange={(newDate) => {
+                  if (newDate?.valueOf()) {
+                    setStartDateMS(
+                      moment(newDate.valueOf()).startOf("D").valueOf()
                     );
-                    delete clientData.householdInfo;
-                    clientData.registrationDate = moment(
-                      clientData.registrationDate
-                    ).format("MM-DD-YYYY");
-                    return clientData;
+                  }
+                }}
+                maxDate={moment()}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <KeyboardDatePicker
+                style={{ width: "100%" }}
+                autoOk={true}
+                showTodayButton={true}
+                value={moment(endDateMS).toDate()}
+                format="YYYY-MM-DD"
+                onChange={(newDate) => {
+                  if (newDate?.valueOf()) {
+                    setEndDateMS(
+                      moment(newDate.valueOf()).endOf("D").valueOf()
+                    );
+                  }
+                }}
+                maxDate={moment()}
+              />
+            </Grid>
+            <Button
+              fullWidth
+              variant="contained"
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.buttonTextColor,
+                marginTop: 16,
+              }}
+              onClick={async () => {
+                if (globalState.user) {
+                  const clientCheckinsAndClient = await getClientCheckinReport({
+                    pantryId: globalState.user.pantry.id,
+                    startDateMS,
+                    endDateMS,
                   });
-                  setCSVData(data);
+                  let numAdults = 0;
+                  let numKids = 0;
+                  let numSeniors = 0;
+                  let numMales = 0;
+                  let numFemales = 0;
+                  let numOtherGender = 0;
+                  let numWhite = 0;
+                  let numBlack = 0;
+                  let numHispanic = 0;
+                  let numAsian = 0;
+                  let numOtherEthnicity = 0;
+                  console.log("HERE");
+                  if (clientCheckinsAndClient.length) {
+                    const data = clientCheckinsAndClient.map(
+                      (checkinAndClient) => {
+                        numAdults +=
+                          checkinAndClient.client.householdInfo.numAdults;
+                        numKids +=
+                          checkinAndClient.client.householdInfo.numKids;
+                        numSeniors +=
+                          checkinAndClient.client.householdInfo.numSeniors;
+                        numMales +=
+                          checkinAndClient.client.householdInfo.numMales;
+                        numFemales +=
+                          checkinAndClient.client.householdInfo.numFemales;
+                        numOtherGender +=
+                          checkinAndClient.client.householdInfo.numOtherGender;
+                        numWhite +=
+                          checkinAndClient.client.householdInfo.numWhite;
+                        numBlack +=
+                          checkinAndClient.client.householdInfo.numBlack;
+                        numHispanic +=
+                          checkinAndClient.client.householdInfo.numHispanic;
+                        numAsian +=
+                          checkinAndClient.client.householdInfo.numAsian;
+                        numOtherEthnicity +=
+                          checkinAndClient.client.householdInfo
+                            .numOtherEthnicity;
+                        const { clientCheckIn, client } = checkinAndClient;
+                        const clientCheckInData: any = { ...clientCheckIn };
+                        const clientData: any = _.merge(
+                          client,
+                          client.householdInfo
+                        );
+                        delete clientData.householdInfo;
+                        delete clientData.registeredPantries;
+                        clientData.registrationDate = moment(
+                          clientData.registrationDate
+                        ).format("MM-DD-YYYY");
+                        clientCheckInData.checkinDate = moment(
+                          clientCheckInData.checkinDate
+                        ).format("MM-DD-YYYY");
+                        console.log("BLAH");
+                        console.log(_.merge(clientData, clientCheckInData));
+                        return _.merge(clientData, clientCheckInData);
+                      }
+                    );
+                    setCSVData(data);
+                  }
                 }
-              }
-            }}
-          >
-            Get Current Client List
-          </Button>
-        </Grid>
-        {csvData.length ? (
-          <CSVLink
-            style={{ marginTop: 16 }}
-            data={csvData}
-            headers={ClientKeys.map((key) => ({ key, label: key }))}
-            filename={"client_upload_results.csv"}
-          >
-            {`Download Result File`}
-          </CSVLink>
-        ) : null}
-      </div>
+              }}
+            >
+              Get Client Checkin Report
+            </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              style={{
+                backgroundColor: COLORS.primary,
+                color: COLORS.buttonTextColor,
+                marginTop: 64,
+              }}
+              onClick={async () => {
+                if (globalState.user) {
+                  const clients = await getAllPantryClients({
+                    pantryId: globalState.user.pantry.id,
+                  });
+                  console.log(globalState.user.pantry.id);
+                  if (clients.length) {
+                    const data = clients.map((client) => {
+                      const clientData: any = _.merge(
+                        client,
+                        client.householdInfo
+                      );
+                      delete clientData.householdInfo;
+                      delete clientData.registeredPantries;
+                      clientData.registrationDate = moment(
+                        clientData.registrationDate
+                      ).format("MM-DD-YYYY");
+                      return clientData;
+                    });
+                    setCSVData(data);
+                  }
+                }
+              }}
+            >
+              Get Master Client List
+            </Button>
+          </Grid>
+          {csvData.length ? (
+            <CSVLink
+              style={{ marginTop: 16 }}
+              data={csvData}
+              headers={ClientKeys.map((key) => ({ key, label: key }))}
+              filename={"client_upload_results.csv"}
+            >
+              {`Download Result File`}
+            </CSVLink>
+          ) : null}
+        </div>
+      </MuiPickersUtilsProvider>
     </Container>
   );
 }
