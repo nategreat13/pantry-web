@@ -1,7 +1,7 @@
 {
   "name": "pantry-web",
   "version": "0.1.0",
-  "homepage": ".",
+  "homepage": "",
   "private": true,
   "dependencies": {
     "@date-io/date-fns": "^2.10.11",
@@ -68,5 +68,9 @@
   },
   "devDependencies": {
     "@types/react-native-web": "npm:@types/react-native"
-  }
+  },
+  "rewrites": [ {
+    "source": "**",
+    "destination": "/index.html"
+}]
 }
