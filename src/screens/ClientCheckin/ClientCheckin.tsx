@@ -309,7 +309,7 @@ export function ClientCheckin() {
             No Clients Found
           </StyledText>
         ) : null}
-        {/* {globalState.user && globalState.user.isAdmin ? (
+        {globalState.user && globalState.user.isAdmin ? (
           <Button
             type="submit"
             fullWidth
@@ -323,7 +323,7 @@ export function ClientCheckin() {
           >
             Reports
           </Button>
-        ) : null} */}
+        ) : null}
       </div>
     </Container>
   );

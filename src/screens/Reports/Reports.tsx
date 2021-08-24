@@ -26,6 +26,7 @@ import MomentUtils from "@date-io/moment";
 import { MaterialUiPickersDate } from "@material-ui/pickers/typings/date";
 import { getClientCheckinReport } from "../../api/clientCheckIn/getClientCheckinReport";
 import { checkInClient } from "../../api/clientCheckIn/checkInClient";
+import { CheckInKeys } from "../../models/clientCheckin.schema";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,7 +58,12 @@ export function Reports() {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [globalState, setGlobalState] = useGlobalContext();
-  const [csvData, setCSVData] = useState<any[]>([]);
+  const [csvDataForClientListReport, setCsvDataForClientListReport] = useState<
+    any[]
+  >([]);
+  const [csvDataForCheckinReport, setCsvDataForCheckinReport] = useState<any[]>(
+    []
+  );
 
   const [startDateMS, setStartDateMS] = useState(
     moment().startOf("M").startOf("D").valueOf()
@@ -155,7 +161,6 @@ export function Reports() {
                   let numHispanic = 0;
                   let numAsian = 0;
                   let numOtherEthnicity = 0;
-                  console.log("HERE");
                   if (clientCheckinsAndClient.length) {
                     const data = clientCheckinsAndClient.map(
                       (checkinAndClient) => {
@@ -196,18 +201,33 @@ export function Reports() {
                         clientCheckInData.checkinDate = moment(
                           clientCheckInData.checkinDate
                         ).format("MM-DD-YYYY");
-                        console.log("BLAH");
-                        console.log(_.merge(clientData, clientCheckInData));
+                        delete clientCheckInData.id;
                         return _.merge(clientData, clientCheckInData);
                       }
                     );
-                    setCSVData(data);
+                    setCsvDataForCheckinReport(data);
                   }
                 }
               }}
             >
               Get Client Checkin Report
             </Button>
+            {csvDataForCheckinReport.length ? (
+              <CSVLink
+                style={{ marginTop: 16 }}
+                data={csvDataForCheckinReport}
+                headers={[
+                  ...ClientKeys.map((key) => ({ key, label: key })),
+                  ...CheckInKeys.filter((key) => key !== "id").map((key) => ({
+                    key,
+                    label: key,
+                  })),
+                ]}
+                filename={"checkin_report.csv"}
+              >
+                {`Download Result File`}
+              </CSVLink>
+            ) : null}
             <Button
               fullWidth
               variant="contained"
@@ -221,7 +241,6 @@ export function Reports() {
                   const clients = await getAllPantryClients({
                     pantryId: globalState.user.pantry.id,
                   });
-                  console.log(globalState.user.pantry.id);
                   if (clients.length) {
                     const data = clients.map((client) => {
                       const clientData: any = _.merge(
@@ -235,7 +254,7 @@ export function Reports() {
                       ).format("MM-DD-YYYY");
                       return clientData;
                     });
-                    setCSVData(data);
+                    setCsvDataForClientListReport(data);
                   }
                 }
               }}
@@ -243,12 +262,12 @@ export function Reports() {
               Get Master Client List
             </Button>
           </Grid>
-          {csvData.length ? (
+          {csvDataForClientListReport.length ? (
             <CSVLink
               style={{ marginTop: 16 }}
-              data={csvData}
+              data={csvDataForClientListReport}
               headers={ClientKeys.map((key) => ({ key, label: key }))}
-              filename={"client_upload_results.csv"}
+              filename={"client_list.csv"}
             >
               {`Download Result File`}
             </CSVLink>

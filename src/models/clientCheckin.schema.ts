@@ -6,3 +6,14 @@ export interface ClientCheckin {
   volunteerName: string;
   volunteerEmail: string;
 }
+
+const ClientCheckInForKeys: Required<ClientCheckin> = {
+  id: "",
+  clientId: "",
+  pantryId: "",
+  checkinDate: 0,
+  volunteerEmail: "",
+  volunteerName: "",
+};
+
+export const CheckInKeys = Object.keys(ClientCheckInForKeys);
