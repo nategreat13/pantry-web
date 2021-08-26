@@ -202,6 +202,7 @@ export function Reports() {
                           clientCheckInData.checkinDate
                         ).format("MM-DD-YYYY");
                         delete clientCheckInData.id;
+
                         return _.merge(clientData, clientCheckInData);
                       }
                     );
@@ -212,22 +213,31 @@ export function Reports() {
             >
               Get Client Checkin Report
             </Button>
-            {csvDataForCheckinReport.length ? (
-              <CSVLink
-                style={{ marginTop: 16 }}
-                data={csvDataForCheckinReport}
-                headers={[
-                  ...ClientKeys.map((key) => ({ key, label: key })),
-                  ...CheckInKeys.filter((key) => key !== "id").map((key) => ({
-                    key,
-                    label: key,
-                  })),
-                ]}
-                filename={"checkin_report.csv"}
-              >
-                {`Download Result File`}
-              </CSVLink>
-            ) : null}
+            <View
+              style={{
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              {csvDataForCheckinReport.length ? (
+                <CSVLink
+                  style={{ marginTop: 16 }}
+                  data={csvDataForCheckinReport}
+                  headers={[
+                    ...ClientKeys.filter(
+                      (key) => key !== "registeredPantries"
+                    ).map((key) => ({ key, label: key })),
+                    ...CheckInKeys.filter((key) => key !== "id").map((key) => ({
+                      key,
+                      label: key,
+                    })),
+                  ]}
+                  filename={"checkin_report.csv"}
+                >
+                  {`Download Result File`}
+                </CSVLink>
+              ) : null}
+            </View>
             <Button
               fullWidth
               variant="contained"
@@ -266,7 +276,9 @@ export function Reports() {
             <CSVLink
               style={{ marginTop: 16 }}
               data={csvDataForClientListReport}
-              headers={ClientKeys.map((key) => ({ key, label: key }))}
+              headers={ClientKeys.filter(
+                (key) => key !== "registeredPantries"
+              ).map((key) => ({ key, label: key }))}
               filename={"client_list.csv"}
             >
               {`Download Result File`}
