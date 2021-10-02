@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { COLORS } from "../../constants/COLORS";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import { Client, ClientKeys } from "../../models/client.schema";
 import _ from "lodash";
 import { useHistory } from "react-router-dom";
@@ -64,6 +65,12 @@ export function Reports() {
   const [csvDataForCheckinReport, setCsvDataForCheckinReport] = useState<any[]>(
     []
   );
+  const [clientListReportErrorMsg, setClientListReportErrorMsg] = useState("");
+  const [CheckinReportErrorMsg, setCheckinReportErrorMsg] = useState("");
+
+  const [clientListReportIsLoading, setClientListReportIsLoading] =
+    useState(false);
+  const [CheckinReportIsLoading, setCheckinReportIsLoading] = useState(false);
 
   const [startDateMS, setStartDateMS] = useState(
     moment().startOf("M").startOf("D").valueOf()
@@ -145,69 +152,88 @@ export function Reports() {
               }}
               onClick={async () => {
                 if (globalState.user) {
-                  const clientCheckinsAndClient = await getClientCheckinReport({
-                    pantryId: globalState.user.pantry.id,
-                    startDateMS,
-                    endDateMS,
-                  });
-                  let numAdults = 0;
-                  let numKids = 0;
-                  let numSeniors = 0;
-                  let numMales = 0;
-                  let numFemales = 0;
-                  let numOtherGender = 0;
-                  let numWhite = 0;
-                  let numBlack = 0;
-                  let numHispanic = 0;
-                  let numAsian = 0;
-                  let numOtherEthnicity = 0;
-                  if (clientCheckinsAndClient.length) {
-                    const data = clientCheckinsAndClient.map(
-                      (checkinAndClient) => {
-                        numAdults +=
-                          checkinAndClient.client.householdInfo.numAdults;
-                        numKids +=
-                          checkinAndClient.client.householdInfo.numKids;
-                        numSeniors +=
-                          checkinAndClient.client.householdInfo.numSeniors;
-                        numMales +=
-                          checkinAndClient.client.householdInfo.numMales;
-                        numFemales +=
-                          checkinAndClient.client.householdInfo.numFemales;
-                        numOtherGender +=
-                          checkinAndClient.client.householdInfo.numOtherGender;
-                        numWhite +=
-                          checkinAndClient.client.householdInfo.numWhite;
-                        numBlack +=
-                          checkinAndClient.client.householdInfo.numBlack;
-                        numHispanic +=
-                          checkinAndClient.client.householdInfo.numHispanic;
-                        numAsian +=
-                          checkinAndClient.client.householdInfo.numAsian;
-                        numOtherEthnicity +=
-                          checkinAndClient.client.householdInfo
-                            .numOtherEthnicity;
-                        const { clientCheckIn, client } = checkinAndClient;
-                        const clientCheckInData: any = { ...clientCheckIn };
-                        const clientData: any = _.merge(
-                          client,
-                          client.householdInfo
-                        );
-                        delete clientData.householdInfo;
-                        delete clientData.registeredPantries;
-                        clientData.registrationDate = moment(
-                          clientData.registrationDate
-                        ).format("MM-DD-YYYY");
-                        clientCheckInData.checkinDate = moment(
-                          clientCheckInData.checkinDate
-                        ).format("MM-DD-YYYY");
-                        delete clientCheckInData.id;
+                  setCheckinReportIsLoading(true);
+                  try {
+                    const clientCheckinsAndClient =
+                      await getClientCheckinReport({
+                        pantryId: globalState.user.pantry.id,
+                        startDateMS,
+                        endDateMS,
+                      });
+                    let numAdults = 0;
+                    let numKids = 0;
+                    let numSeniors = 0;
+                    let numMales = 0;
+                    let numFemales = 0;
+                    let numOtherGender = 0;
+                    let numWhite = 0;
+                    let numBlack = 0;
+                    let numHispanic = 0;
+                    let numAsian = 0;
+                    let numOtherEthnicity = 0;
+                    if (clientCheckinsAndClient.length) {
+                      const data = clientCheckinsAndClient.map(
+                        (checkinAndClient) => {
+                          /*
+                          numAdults +=
+                            checkinAndClient.client.householdInfo.numAdults ??
+                            0;
+                          numKids +=
+                            checkinAndClient.client.householdInfo.numKids ?? 0;
+                          numSeniors +=
+                            checkinAndClient.client.householdInfo.numSeniors ??
+                            0;
+                          numMales +=
+                            checkinAndClient.client.householdInfo.numMales ?? 0;
+                          numFemales +=
+                            checkinAndClient.client.householdInfo.numFemales ??
+                            0;
+                          numOtherGender +=
+                            checkinAndClient.client.householdInfo
+                              .numOtherGender ?? 0;
+                          numWhite +=
+                            checkinAndClient.client.householdInfo.numWhite ?? 0;
+                          numBlack +=
+                            checkinAndClient.client.householdInfo.numBlack ?? 0;
+                          numHispanic +=
+                            checkinAndClient.client.householdInfo.numHispanic ??
+                            0;
+                          numAsian +=
+                            checkinAndClient.client.householdInfo.numAsian ?? 0;
+                          numOtherEthnicity +=
+                            checkinAndClient.client.householdInfo
+                              .numOtherEthnicity ?? 0;
+                              */
+                          const { clientCheckIn, client } = checkinAndClient;
+                          const clientCheckInData: any = { ...clientCheckIn };
+                          const clientData: any = _.merge(
+                            client,
+                            client.householdInfo
+                          );
+                          delete clientData.householdInfo;
+                          delete clientData.registeredPantries;
+                          clientData.registrationDate = moment(
+                            clientData.registrationDate
+                          ).format("MM-DD-YYYY");
+                          clientCheckInData.checkinDate = moment(
+                            clientCheckInData.checkinDate
+                          ).format("MM-DD-YYYY");
+                          delete clientCheckInData.id;
 
-                        return _.merge(clientData, clientCheckInData);
-                      }
-                    );
-                    setCsvDataForCheckinReport(data);
+                          return _.merge(clientData, clientCheckInData);
+                        }
+                      );
+                      setCsvDataForCheckinReport(data);
+                    } else {
+                      setCsvDataForCheckinReport([]);
+                      setCheckinReportErrorMsg("No Results");
+                    }
+                  } catch (e) {
+                    console.log(e);
+                    setCsvDataForCheckinReport([]);
+                    setCheckinReportErrorMsg("Something went wrong");
                   }
+                  setCheckinReportIsLoading(false);
                 }
               }}
             >
@@ -219,7 +245,9 @@ export function Reports() {
                 alignItems: "center",
               }}
             >
-              {csvDataForCheckinReport.length ? (
+              {CheckinReportIsLoading ? (
+                <CircularProgress style={{ marginTop: 16 }} />
+              ) : csvDataForCheckinReport.length ? (
                 <CSVLink
                   style={{ marginTop: 16 }}
                   data={csvDataForCheckinReport}
@@ -236,6 +264,10 @@ export function Reports() {
                 >
                   {`Download Result File`}
                 </CSVLink>
+              ) : CheckinReportErrorMsg ? (
+                <StyledText style={{ color: "red", marginTop: 16 }}>
+                  {CheckinReportErrorMsg}
+                </StyledText>
               ) : null}
             </View>
             <Button
@@ -248,31 +280,40 @@ export function Reports() {
               }}
               onClick={async () => {
                 if (globalState.user) {
-                  const clients = await getAllPantryClients({
-                    pantryId: globalState.user.pantry.id,
-                  });
-                  if (clients.length) {
-                    const data = clients.map((client) => {
-                      const clientData: any = _.merge(
-                        client,
-                        client.householdInfo
-                      );
-                      delete clientData.householdInfo;
-                      delete clientData.registeredPantries;
-                      clientData.registrationDate = moment(
-                        clientData.registrationDate
-                      ).format("MM-DD-YYYY");
-                      return clientData;
+                  setClientListReportIsLoading(true);
+                  try {
+                    const clients = await getAllPantryClients({
+                      pantryId: globalState.user.pantry.id,
                     });
-                    setCsvDataForClientListReport(data);
-                  }
+                    if (clients.length) {
+                      const data = clients.map((client) => {
+                        const clientData: any = _.merge(
+                          client,
+                          client.householdInfo
+                        );
+                        delete clientData.householdInfo;
+                        delete clientData.registeredPantries;
+                        clientData.registrationDate = moment(
+                          clientData.registrationDate
+                        ).format("MM-DD-YYYY");
+                        return clientData;
+                      });
+                      setCsvDataForClientListReport(data);
+                    } else {
+                      setCsvDataForClientListReport([]);
+                      setClientListReportErrorMsg("No Results");
+                    }
+                  } catch (e) {}
+                  setClientListReportIsLoading(false);
                 }
               }}
             >
               Get Master Client List
             </Button>
           </Grid>
-          {csvDataForClientListReport.length ? (
+          {clientListReportIsLoading ? (
+            <CircularProgress style={{ marginTop: 16 }} />
+          ) : csvDataForClientListReport.length ? (
             <CSVLink
               style={{ marginTop: 16 }}
               data={csvDataForClientListReport}
@@ -283,6 +324,10 @@ export function Reports() {
             >
               {`Download Result File`}
             </CSVLink>
+          ) : clientListReportErrorMsg ? (
+            <StyledText style={{ color: "red", marginTop: 24 }}>
+              {clientListReportErrorMsg}
+            </StyledText>
           ) : null}
         </div>
       </MuiPickersUtilsProvider>

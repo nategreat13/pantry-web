@@ -44,12 +44,9 @@ export async function getClientCheckinReport(p: {
     return acc;
   }, {} as Record<string, Client>);
 
-  for (
-    let i = 0;
-    i < _.orderBy(clientCheckins, "checkinDate", "desc").length;
-    i++
-  ) {
-    const clientCheckIn = clientCheckins[i];
+  const sortedCheckIns = _.orderBy(clientCheckins, "checkinDate", "desc");
+  for (let i = 0; i < sortedCheckIns.length; i++) {
+    const clientCheckIn = sortedCheckIns[i];
     const client = clientsMap[clientCheckIn.clientId];
     if (clientCheckIn && client) {
       clientCheckinsAndClients.push({
