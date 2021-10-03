@@ -62,9 +62,8 @@ export function Reports() {
   const [csvDataForClientListReport, setCsvDataForClientListReport] = useState<
     any[]
   >([]);
-  const [csvDataForCheckinReport, setCsvDataForCheckinReport] = useState<any[]>(
-    []
-  );
+  const [csvDataForCheckinReport, setCsvDataForCheckinReport] =
+    useState<string>("");
   const [clientListReportErrorMsg, setClientListReportErrorMsg] = useState("");
   const [CheckinReportErrorMsg, setCheckinReportErrorMsg] = useState("");
 
@@ -153,6 +152,7 @@ export function Reports() {
               onClick={async () => {
                 if (globalState.user) {
                   setCheckinReportIsLoading(true);
+                  let csvString = `Check-In Date,First Name,Last Name,Client Id,Males,Females,Other Gender,Adults,Seniors,Kids,White,Black,Hispanic,Asian,Other Ethnicity,Volunteer Name\n`;
                   try {
                     const clientCheckinsAndClient =
                       await getClientCheckinReport({
@@ -160,77 +160,88 @@ export function Reports() {
                         startDateMS,
                         endDateMS,
                       });
-                    let numAdults = 0;
-                    let numKids = 0;
-                    let numSeniors = 0;
-                    let numMales = 0;
-                    let numFemales = 0;
-                    let numOtherGender = 0;
-                    let numWhite = 0;
-                    let numBlack = 0;
-                    let numHispanic = 0;
-                    let numAsian = 0;
-                    let numOtherEthnicity = 0;
-                    if (clientCheckinsAndClient.length) {
-                      const data = clientCheckinsAndClient.map(
-                        (checkinAndClient) => {
-                          /*
-                          numAdults +=
-                            checkinAndClient.client.householdInfo.numAdults ??
-                            0;
-                          numKids +=
-                            checkinAndClient.client.householdInfo.numKids ?? 0;
-                          numSeniors +=
-                            checkinAndClient.client.householdInfo.numSeniors ??
-                            0;
-                          numMales +=
-                            checkinAndClient.client.householdInfo.numMales ?? 0;
-                          numFemales +=
-                            checkinAndClient.client.householdInfo.numFemales ??
-                            0;
-                          numOtherGender +=
-                            checkinAndClient.client.householdInfo
-                              .numOtherGender ?? 0;
-                          numWhite +=
-                            checkinAndClient.client.householdInfo.numWhite ?? 0;
-                          numBlack +=
-                            checkinAndClient.client.householdInfo.numBlack ?? 0;
-                          numHispanic +=
-                            checkinAndClient.client.householdInfo.numHispanic ??
-                            0;
-                          numAsian +=
-                            checkinAndClient.client.householdInfo.numAsian ?? 0;
-                          numOtherEthnicity +=
-                            checkinAndClient.client.householdInfo
-                              .numOtherEthnicity ?? 0;
-                              */
-                          const { clientCheckIn, client } = checkinAndClient;
-                          const clientCheckInData: any = { ...clientCheckIn };
-                          const clientData: any = _.merge(
-                            client,
-                            client.householdInfo
-                          );
-                          delete clientData.householdInfo;
-                          delete clientData.registeredPantries;
-                          clientData.registrationDate = moment(
-                            clientData.registrationDate
-                          ).format("MM-DD-YYYY");
-                          clientCheckInData.checkinDate = moment(
-                            clientCheckInData.checkinDate
-                          ).format("MM-DD-YYYY");
-                          delete clientCheckInData.id;
 
-                          return _.merge(clientData, clientCheckInData);
-                        }
-                      );
-                      setCsvDataForCheckinReport(data);
+                    let totals = {
+                      numAdults: 0,
+                      numKids: 0,
+                      numSeniors: 0,
+                      numMales: 0,
+                      numFemales: 0,
+                      numOtherGender: 0,
+                      numWhite: 0,
+                      numBlack: 0,
+                      numHispanic: 0,
+                      numAsian: 0,
+                      numOtherEthnicity: 0,
+                    };
+
+                    if (clientCheckinsAndClient.length) {
+                      for (let i = 0; i < clientCheckinsAndClient.length; i++) {
+                        const checkinAndClient = clientCheckinsAndClient[i];
+                        const { clientCheckIn, client } = checkinAndClient;
+                        const clientCheckInData: any = { ...clientCheckIn };
+                        const clientData: any = _.merge(
+                          client,
+                          client.householdInfo
+                        );
+                        delete clientData.householdInfo;
+                        delete clientData.registeredPantries;
+
+                        // Add to totals
+                        totals.numAdults += clientData.numAdults ?? 0;
+                        totals.numKids += clientData.numKids ?? 0;
+                        totals.numSeniors += clientData.numSeniors ?? 0;
+                        totals.numMales += clientData.numMales ?? 0;
+                        totals.numFemales += clientData.numFemales ?? 0;
+                        totals.numOtherGender += clientData.numOtherGender ?? 0;
+                        totals.numWhite += clientData.numWhite ?? 0;
+                        totals.numBlack += clientData.numBlack ?? 0;
+                        totals.numHispanic += clientData.numHispanic ?? 0;
+                        totals.numAsian += clientData.numAsian ?? 0;
+                        totals.numOtherEthnicity +=
+                          clientData.numOtherEthnicity ?? 0;
+
+                        clientData.registrationDate = moment(
+                          clientData.registrationDate
+                        ).format("MM-DD-YYYY");
+                        clientCheckInData.checkinDate = moment(
+                          clientCheckInData.checkinDate
+                        ).format("MM-DD-YYYY");
+
+                        csvString += `${clientCheckInData.checkinDate},${client.firstName},${client.lastName},${client.id},${clientData.numMales},${clientData.numFemales},${clientData.numOtherGender},${clientData.numAdults},${clientData.numSeniors},${clientData.numKids},${clientData.numWhite},${clientData.numBlack},${clientData.numHispanic},${clientData.numAsian},${clientData.numOtherEthnicity},${clientCheckIn.volunteerName}\n`;
+                        delete clientCheckInData.id;
+                      }
+
+                      csvString =
+                        `Checkin Report from ${moment(startDateMS).format(
+                          "YYYY-MM-DD"
+                        )} to ${moment(startDateMS).format(
+                          "YYYY-MM-DD"
+                        )}\n\nTotals\Total People Served,${
+                          totals.numMales +
+                          totals.numFemales +
+                          totals.numOtherGender
+                        }\nMales,${totals.numMales}\nFemales,${
+                          totals.numFemales
+                        }\nOther Gender,${totals.numOtherGender}\nAdults,${
+                          totals.numAdults
+                        }\nSeniors,${totals.numSeniors}\nKids,${
+                          totals.numKids
+                        }\nWhite,${totals.numWhite}\nBlack,${
+                          totals.numBlack
+                        }\nHispanic,${totals.numHispanic}\nAsian,${
+                          totals.numAsian
+                        }\nOtherEthnicity,${totals.numOtherEthnicity}\n\n` +
+                        csvString;
+
+                      setCsvDataForCheckinReport(csvString);
                     } else {
-                      setCsvDataForCheckinReport([]);
+                      setCsvDataForCheckinReport("");
                       setCheckinReportErrorMsg("No Results");
                     }
                   } catch (e) {
                     console.log(e);
-                    setCsvDataForCheckinReport([]);
+                    setCsvDataForCheckinReport("");
                     setCheckinReportErrorMsg("Something went wrong");
                   }
                   setCheckinReportIsLoading(false);
@@ -247,27 +258,20 @@ export function Reports() {
             >
               {CheckinReportIsLoading ? (
                 <CircularProgress style={{ marginTop: 16 }} />
-              ) : csvDataForCheckinReport.length ? (
-                <CSVLink
-                  style={{ marginTop: 16 }}
-                  data={csvDataForCheckinReport}
-                  headers={[
-                    ...ClientKeys.filter(
-                      (key) => key !== "registeredPantries"
-                    ).map((key) => ({ key, label: key })),
-                    ...CheckInKeys.filter((key) => key !== "id").map((key) => ({
-                      key,
-                      label: key,
-                    })),
-                  ]}
-                  filename={"checkin_report.csv"}
-                >
-                  {`Download Result File`}
-                </CSVLink>
               ) : CheckinReportErrorMsg ? (
                 <StyledText style={{ color: "red", marginTop: 16 }}>
                   {CheckinReportErrorMsg}
                 </StyledText>
+              ) : csvDataForCheckinReport ? (
+                <View>
+                  <CSVLink
+                    style={{ marginTop: 16 }}
+                    data={csvDataForCheckinReport}
+                    filename={"checkin_report.csv"}
+                  >
+                    {`Download Checkin Report`}
+                  </CSVLink>
+                </View>
               ) : null}
             </View>
             <Button
